@@ -43,11 +43,12 @@ def main():
     test_data = SubImageNetDataset(num_classes=args.num_classes, root='/mnt/lustre/share/images', train=False, transform=test_transform, download=False)
     test_len = len(test_data)
     test_ld = DataLoader(test_data, batch_size=args.batch_size, shuffle=False, drop_last=False, num_workers=4, pin_memory=True)
-    
+
+    prefix = os.path.join(os.path.expanduser('~'), 'htl_ckpt')
     ckpts = [
-        '/mnt/lustre/share/tengjianing/modelzoo/MM/dy/DY_MTL_LV1_10_R50_convertBB.pth.tar',
-        '/mnt/lustre/share/tengjianing/modelzoo/MM/dy/DY_MTL_LV1_30_R50_convertBB.pth.tar',
-        '/mnt/lustre/share/tengjianing/modelzoo/CLIP/xueshuClip.pth.tar',
+        os.path.join(prefix, 'DY_MTL_LV1_10_R50_convertBB.pth.tar'),
+        os.path.join(prefix, 'DY_MTL_LV1_30_R50_convertBB.pth.tar'),
+        os.path.join(prefix, 'xueshuClip.pth.tar'),
     ]
     ckpt_names = [
         os.path.split(ckpt)[-1].replace('.tar', '').replace('.pth', '')
