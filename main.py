@@ -2,6 +2,7 @@ from collections import OrderedDict, defaultdict
 
 import argparse
 import datetime
+import time
 from sklearn.feature_selection import mutual_info_classif
 import torch
 from torch.utils.data import DataLoader
@@ -101,6 +102,7 @@ def main():
     
     for i in range(len(ckpts)):
         if ckpt_idx == i:
+            time.sleep(0.1 * rank)
             print(
                 f'[rk{rank}]: ckpt={ckpt}, mi info:\n    mean={mi_mean:.4f},  max={mi_max:.4f},  top={mi_top_10_percent:.4f}'
             )
@@ -131,7 +133,7 @@ def main():
             'top': [all_mi_topks[ckpt][0] for ckpt in ckpts],
         })
         print(df)
-        df.to_json(f'results_imn{args.num_classes}_neib{args.n_neighbors}_{datetime.datetime.now().strftime("[%m-%d %H:%M:%S]")}.json')
+        df.to_json(f'results_imn{args.num_classes}_neib{args.n_neighbors}_{datetime.datetime.now().strftime("%m-%d %H:%M:%S")}.json')
     
     link.barrier()
     link.finalize()
