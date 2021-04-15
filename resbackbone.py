@@ -167,18 +167,17 @@ def load_r50backbone(ckpt: str, verbose: bool, norm_func=nn.BatchNorm2d, conv_fu
     deep_stem = conv1_shape[0] == 32
     
     if deep_stem:
-        r50_bb = modified_res50backbone(verbose=verbose)
+        r50_bb = modified_res50backbone(clip_pretrain_path=ckpt, verbose=verbose)
+        warning = ''
     else:
         r50_bb = ResBackbone(Bottleneck, [3, 4, 6, 3], norm_func=norm_func, conv_func=conv_func)
-    msg = r50_bb.load_state_dict(d, strict=False)
-    
-    unexpected_missing = [k for k in msg.missing_keys if not k.startswith('fc.')]
-    assert len(unexpected_missing) == 0, f'unexpected msg.missing_keys:\n{pformat(unexpected_missing)}'
-    
-    unexpected_extra = msg.unexpected_keys
-    if len(msg.unexpected_keys):
-        warning = f'[warning] msg.unexpected_keys:\n{pformat(unexpected_extra)}'
-    else:
-        warning = ''
+        msg = r50_bb.load_state_dict(d, strict=False)
+        unexpected_missing = [k for k in msg.missing_keys if not k.startswith('fc.')]
+        assert len(unexpected_missing) == 0, f'unexpected msg.missing_keys:\n{pformat(unexpected_missing)}'
+        unexpected_extra = msg.unexpected_keys
+        if len(msg.unexpected_keys):
+            warning = f'[warning] msg.unexpected_keys:\n{pformat(unexpected_extra)}'
+        else:
+            warning = ''
     return r50_bb, warning
 
