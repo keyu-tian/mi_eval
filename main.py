@@ -27,7 +27,6 @@ def link_init():
 
 
 def calc_mi(features: torch.Tensor, labels: torch.Tensor, args):
-    print(features.shape, labels.shape)
     return [knn_mi.mi(features.numpy(), labels.view(features.shape[0], -1).numpy(), k=args.n_neighbors)]
     # return mutual_info_classif(features, labels, n_neighbors=args.n_neighbors)
 
@@ -93,7 +92,7 @@ def main():
             bs = x.shape[0]
             h = r50_bb(x.cuda()).cpu()
             y = y.view(bs, 1).int()
-            inputs.append(F.avg_pool2d(x, kernel_size=8).view(bs, -1))
+            inputs.append(F.avg_pool2d(x.mean(dim=1), kernel_size=4).view(bs, -1))
             features.append(h)
             labels.append(y)
             if rank == 0:
