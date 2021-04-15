@@ -28,7 +28,7 @@ def link_init():
 
 def calc_mi(features: torch.Tensor, labels: torch.Tensor, args):
     print(features.shape, labels.shape)
-    return [knn_mi.mi(features.numpy(), labels.view(features.shape[0], -1).numpy())]
+    return [knn_mi.mi(features.numpy(), labels.view(features.shape[0], -1).numpy(), k=args.n_neighbors)]
     # return mutual_info_classif(features, labels, n_neighbors=args.n_neighbors)
 
 
