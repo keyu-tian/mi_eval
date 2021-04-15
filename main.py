@@ -41,8 +41,8 @@ def main():
     # exit(0)
     
     parser = argparse.ArgumentParser(description='MI test')
-    parser.add_argument('--num_classes', default=30, type=int)
-    parser.add_argument('--n_neighbors', default=3, type=int)
+    parser.add_argument('--num_classes', default=50, type=int)
+    parser.add_argument('--n_neighbors', default=50, type=int)
     parser.add_argument('--batch_size', default=256, type=int)
     args = parser.parse_args()
     
