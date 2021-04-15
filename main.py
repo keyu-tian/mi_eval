@@ -107,7 +107,7 @@ def main():
     assert features.shape[0] == labels.shape[0] == test_len
     
     if rank == 0:
-        print(f'[rk{rank}]: features={features.dtype} {tuple(features.shape)},  labels.shape={labels.dtype} {tuple(labels.shape)}')
+        print(f'[rk{rank}]: features={features.dtype} {tuple(features.shape)},  labels.shape={labels.dtype} {tuple(labels.shape)},  input.shape={input.dtype} {tuple(input.shape)}')
 
     stt = time.time()
     hy_mi_values = calc_mi(features, labels, args)
