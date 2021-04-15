@@ -165,9 +165,10 @@ def load_r50backbone(ckpt: str, norm_func=nn.BatchNorm2d, conv_func=nn.Conv2d):
         d = d['state_dict']
     conv1_shape = d['conv1.weight'].shape
     deep_stem = conv1_shape[0] == 32
+    enable_attnpool = 'attnpool.k_proj.weight' in d
     
     if deep_stem:
-        r50_bb, warning = modified_res50backbone(clip_pretrain_path=ckpt)
+        r50_bb, warning = modified_res50backbone(clip_pretrain_path=ckpt, enable_attnpool=enable_attnpool)
     else:
         r50_bb = ResBackbone(Bottleneck, [3, 4, 6, 3], norm_func=norm_func, conv_func=conv_func)
         msg = r50_bb.load_state_dict(d, strict=False)
