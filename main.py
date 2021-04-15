@@ -91,9 +91,9 @@ def main():
     with torch.no_grad():
         for x, y in bar:
             bs = x.shape[0]
-            h = torch.from_numpy(r50_bb(x.cuda()).cpu().numpy())
-            y = torch.from_numpy(y.view(bs, 1).numpy().astype(int))
-            inputs.append(F.avg_pool2d(x, kernel_size=8).view(bs, -1).numpy())
+            h = r50_bb(x.cuda()).cpu()
+            y = y.view(bs, 1).int()
+            inputs.append(F.avg_pool2d(x, kernel_size=8).view(bs, -1))
             features.append(h)
             labels.append(y)
             if rank == 0:
