@@ -48,6 +48,9 @@ def main():
     
     rank, world_size = link_init()
     
+    if rank == 0:
+        print(f'[rk{rank}]: args=\n{vars(args)}\n')
+    
     test_transform = transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
