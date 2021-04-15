@@ -10,7 +10,7 @@ __all__ = ['modified_res50backbone']
 BN = nn.BatchNorm2d
 
 
-def load_clip_state_vision_model(model, ckpt_path, verbose):
+def load_clip_state_vision_model(model, ckpt_path, warning):
     try:
         ckpt_state = torch.load(ckpt_path, map_location='cpu')
     except:
@@ -26,9 +26,9 @@ def load_clip_state_vision_model(model, ckpt_path, verbose):
         # cleaned CLIP checkpoint, no prefix
         prefix = ''
 
-    if verbose: print('======= loading CLIP model state... =======')
+    warning.append('======= loading CLIP model state... =======')
     if ckpt_state:
-        if verbose: print('======= loading vision model state with prefix "{}" from CLIP model... ======='.format(prefix))
+        warning.append('======= loading vision model state with prefix "{}" from CLIP model... ======='.format(prefix))
         
         own_state = model.state_dict()
         state = {}
@@ -49,21 +49,21 @@ def load_clip_state_vision_model(model, ckpt_path, verbose):
                         own_state[name].copy_(param)
                     success_cnt += 1
                 except Exception as err:
-                    if verbose: print(err)
-                    if verbose: print('while copying the parameter named {}, '
+                    warning.append(err)
+                    warning.append('while copying the parameter named {}, '
                                          'whose dimensions in the model are {} and '
                                          'whose dimensions in the checkpoint are {}.'
                                          .format(name, own_state[name].size(), param.size()))
-                    if verbose: print("But don't worry about it. Continue pretraining.")
+                    warning.append("But don't worry about it. Continue pretraining.")
         ckpt_keys = set(state.keys())
         own_keys = set(model.state_dict().keys())
         missing_keys = own_keys - ckpt_keys
-        if verbose: print('Successfully loaded {} key(s)'.format(success_cnt))
+        warning.append('Successfully loaded {} key(s)'.format(success_cnt))
         for k in missing_keys:
-            if verbose: print('Caution: missing key from vision model of CLIP checkpoint: {}'.format(k))
+            warning.append('Caution: missing key from vision model of CLIP checkpoint: {}'.format(k))
         redundancy_keys = ckpt_keys - own_keys
         for k in redundancy_keys:
-            if verbose: print('Caution: redundant key from vision model of CLIP checkpoint: {}'.format(k))
+            warning.append('Caution: redundant key from vision model of CLIP checkpoint: {}'.format(k))
 
 
 class Bottleneck(nn.Module):
@@ -158,7 +158,7 @@ class ModifiedResNet(nn.Module):
     """
 
     def __init__(self, layers, output_dim, heads, input_resolution=224, width=64,
-                 num_classes=1000, clip_pretrain_path=None, enable_attnpool=False, verbose=False):
+                 num_classes=1000, clip_pretrain_path=None, enable_attnpool=False):
 
         global BN
 
@@ -204,8 +204,10 @@ class ModifiedResNet(nn.Module):
                 if name.endswith("bn3.weight"):
                     nn.init.zeros_(param)
 
+        self.warning = []
         if clip_pretrain_path is not None:
-            load_clip_state_vision_model(self, clip_pretrain_path, verbose)
+            load_clip_state_vision_model(self, clip_pretrain_path, self.warning)
+        self.warning = '\n'.join(self.warning)
 
     def _make_layer(self, planes, blocks, stride=1):
         layers = [Bottleneck(self._inplanes, planes, stride)]
@@ -246,4 +248,5 @@ def modified_res50backbone(**kwargs):
         'width': 64,
     }
     default_kwargs.update(**kwargs)
-    return ModifiedResNet(**default_kwargs)
+    r = ModifiedResNet(**default_kwargs)
+    return r, r.warning

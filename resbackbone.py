@@ -159,7 +159,7 @@ class ResBackbone(nn.Module):
         return feature
 
 
-def load_r50backbone(ckpt: str, verbose: bool, norm_func=nn.BatchNorm2d, conv_func=nn.Conv2d):
+def load_r50backbone(ckpt: str, norm_func=nn.BatchNorm2d, conv_func=nn.Conv2d):
     d = torch.load(ckpt, map_location='cpu')
     if set(d.keys()) == {'state_dict'}:
         d = d['state_dict']
@@ -167,8 +167,7 @@ def load_r50backbone(ckpt: str, verbose: bool, norm_func=nn.BatchNorm2d, conv_fu
     deep_stem = conv1_shape[0] == 32
     
     if deep_stem:
-        r50_bb = modified_res50backbone(clip_pretrain_path=ckpt, verbose=verbose)
-        warning = ''
+        r50_bb, warning = modified_res50backbone(clip_pretrain_path=ckpt)
     else:
         r50_bb = ResBackbone(Bottleneck, [3, 4, 6, 3], norm_func=norm_func, conv_func=conv_func)
         msg = r50_bb.load_state_dict(d, strict=False)
