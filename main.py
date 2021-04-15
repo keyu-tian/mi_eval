@@ -100,14 +100,14 @@ def main():
                 bar.set_description_str('[extracting features]')
                 bar.set_postfix(OrderedDict({'imgs': test_len, 'cur_bs': bs, 'ckpt': ckpt_name}))
     
-    inputs = torch.cat(inputs, dim=0)
     features = torch.cat(features, dim=0)
     labels = torch.cat(labels, dim=0)
     labels = labels.reshape(-1)
-    assert features.shape[0] == labels.shape[0] == test_len
+    inputs = torch.cat(inputs, dim=0)
+    assert features.shape[0] == labels.shape[0] == inputs.shape[0] == test_len
     
     if rank == 0:
-        print(f'[rk{rank}]: features={features.dtype} {tuple(features.shape)},  labels.shape={labels.dtype} {tuple(labels.shape)},  input.shape={input.dtype} {tuple(input.shape)}')
+        print(f'[rk{rank}]: features={features.dtype} {tuple(features.shape)},  labels.shape={labels.dtype} {tuple(labels.shape)},  inputs.shape={inputs.dtype} {tuple(inputs.shape)}')
 
     stt = time.time()
     hy_mi_values = calc_mi(features, labels, args)
