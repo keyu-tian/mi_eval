@@ -59,7 +59,7 @@ def main():
     ckpt = ckpts[ckpt_idx]
     ckpt_name = ckpt_names[ckpt_idx]
     inputs, features, labels = [], [], []
-    r50_bb, warning = load_r50backbone(ckpt)
+    r50_bb, warning = load_r50backbone(ckpt, rank == 0)
     if rank < len(ckpts):
         print(f'[rk{rank}]: {warning or "nothing"}')
     r50_bb = r50_bb.cuda()

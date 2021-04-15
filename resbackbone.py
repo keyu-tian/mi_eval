@@ -5,6 +5,8 @@ import math
 import torch
 
 # will be overwritten during runtime
+from modified_resbackbone import modified_res50backbone
+
 BN = torch.nn.BatchNorm2d
 Conv2d = torch.nn.Conv2d
 
@@ -88,7 +90,7 @@ class Bottleneck(nn.Module):
 
 class ResBackbone(nn.Module):
 
-    def __init__(self, block, layers, deep_stem=False, norm_func=nn.BatchNorm2d, conv_func=nn.Conv2d):
+    def __init__(self, block, layers, norm_func=nn.BatchNorm2d, conv_func=nn.Conv2d):
         super(ResBackbone, self).__init__()
 
         global BN
@@ -99,17 +101,8 @@ class ResBackbone(nn.Module):
         
         self.curr_inplanes = 64
 
-        self.deep_stem = deep_stem
-        if self.deep_stem:
-            self.conv1 = Conv2d(3, self.curr_inplanes // 2, kernel_size=3, stride=2, padding=1, bias=False)
-            self.bn1 = BN(self.curr_inplanes // 2)
-            self.conv2 = Conv2d(self.curr_inplanes // 2, self.curr_inplanes // 2, kernel_size=3, stride=1, padding=1, bias=False)
-            self.bn2 = BN(self.curr_inplanes // 2)
-            self.conv3 = Conv2d(self.curr_inplanes // 2, self.curr_inplanes, kernel_size=3, stride=1, padding=1, bias=False)
-            self.bn3 = BN(self.curr_inplanes)
-        else:
-            self.conv1 = Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
-            self.bn1 = BN(64)
+        self.conv1 = Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
+        self.bn1 = BN(64)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         self.layer1 = self._make_layer(block, 64, layers[0])
@@ -154,9 +147,6 @@ class ResBackbone(nn.Module):
 
     def forward(self, x):
         x = self.relu(self.bn1(self.conv1(x)))
-        if self.deep_stem:
-            x = self.relu(self.bn2(self.conv2(x)))
-            x = self.relu(self.bn3(self.conv3(x)))
         x = self.maxpool(x)
 
         layer1 = self.layer1(x)
@@ -169,14 +159,17 @@ class ResBackbone(nn.Module):
         return feature
 
 
-def load_r50backbone(ckpt: str, norm_func=nn.BatchNorm2d, conv_func=nn.Conv2d):
+def load_r50backbone(ckpt: str, verbose: bool, norm_func=nn.BatchNorm2d, conv_func=nn.Conv2d):
     d = torch.load(ckpt, map_location='cpu')
     if set(d.keys()) == {'state_dict'}:
         d = d['state_dict']
     conv1_shape = d['conv1.weight'].shape
     deep_stem = conv1_shape[0] == 32
     
-    r50_bb = ResBackbone(Bottleneck, [3, 4, 6, 3], deep_stem=deep_stem, norm_func=norm_func, conv_func=conv_func)
+    if deep_stem:
+        r50_bb = modified_res50backbone(verbose=verbose)
+    else:
+        r50_bb = ResBackbone(Bottleneck, [3, 4, 6, 3], norm_func=norm_func, conv_func=conv_func)
     msg = r50_bb.load_state_dict(d, strict=False)
     
     unexpected_missing = [k for k in msg.missing_keys if not k.startswith('fc.')]
