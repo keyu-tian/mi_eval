@@ -132,7 +132,7 @@ def main():
     stt = time.time()
     # todo: 如果放开I(h,x)计算，那记得去掉下面的注释
     # hx_mi_values = calc_mi(features, inputs, args)
-    hx_mi_values = 0
+    hx_mi_values = [0]
     hx_cost = time.time()-stt
     
     if rank == 0:
