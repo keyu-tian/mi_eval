@@ -161,8 +161,21 @@ class ResBackbone(nn.Module):
 
 def load_r50backbone(ckpt: str, norm_func=nn.BatchNorm2d, conv_func=nn.Conv2d):
     d = torch.load(ckpt, map_location='cpu')
-    if set(d.keys()) == {'state_dict'}:
+    if 'state_dict' in d.keys():
         d = d['state_dict']
+    if 'module.backbone.conv1.weight' in d.keys():
+        d = {
+            k.replace('module.backbone.', ''): v
+            for k, v in d.items() if k.startswith('module.backbone.')
+        }
+    elif 'backbone.conv1.weight' in d.keys():
+        d = {
+            k.replace('backbone.', ''): v
+            for k, v in d.items() if k.startswith('backbone.')
+        }
+    
+    assert 'conv1.weight' in d.keys(), f'strange keys of the ckpt:\n{list(d.keys())}'
+        
     conv1_shape = d['conv1.weight'].shape
     deep_stem = conv1_shape[0] == 32
     enable_attnpool = 'attnpool.k_proj.weight' in d
