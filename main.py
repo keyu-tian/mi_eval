@@ -14,6 +14,7 @@ from pandas import DataFrame
 import knn_mi
 
 from imagenet import SubImageNetDataset
+from attribute import Age, Gender, Liveness
 from resbackbone import load_r50backbone
 
 import linklink as link
@@ -27,8 +28,8 @@ def link_init():
 
 
 def calc_mi(features: torch.Tensor, labels: torch.Tensor, args):
-    return [knn_mi.mi(features.numpy(), labels.view(features.shape[0], -1).numpy(), k=args.n_neighbors)]
-    # return mutual_info_classif(features, labels, n_neighbors=args.n_neighbors)
+    # return [knn_mi.mi(features.numpy(), labels.view(features.shape[0], -1).numpy(), k=args.n_neighbors)]
+    return mutual_info_classif(features, labels, n_neighbors=args.n_neighbors)
 
 
 def main():
@@ -40,6 +41,7 @@ def main():
     # exit(0)
     
     parser = argparse.ArgumentParser(description='MI test')
+    parser.add_argument('--dataset', required=True, type=str)
     parser.add_argument('--num_classes', default=50, type=int)
     parser.add_argument('--n_neighbors', default=50, type=int)
     parser.add_argument('--batch_size', default=256, type=int)
@@ -58,7 +60,18 @@ def main():
     ])
 
     # ~ num_classes * 1280 images
-    test_data = SubImageNetDataset(num_classes=args.num_classes, root='/mnt/lustre/share/images', train=False, transform=test_transform, download=False)
+    if args.dataset == 'imagenet':
+        test_data = SubImageNetDataset(num_classes=args.num_classes, root='/mnt/lustre/share/images', train=False, transform=test_transform, download=False)
+    elif args.dataset == 'liveness':
+        test_data = Liveness()
+        args.batch_size = 64
+    elif args.dataset == 'gender':
+        test_data = Gender()
+        args.batch_size = 64
+    elif args.dataset == 'age':
+        test_data = Age()
+        args.batch_size = 64
+    
     test_len = len(test_data)
     test_ld = DataLoader(test_data, batch_size=args.batch_size, shuffle=False, drop_last=False, num_workers=4, pin_memory=True)
 
@@ -113,7 +126,9 @@ def main():
     hy_cost = time.time()-stt
 
     stt = time.time()
-    hx_mi_values = calc_mi(features, inputs, args)
+    # todo: 如果放开I(h,x)计算，那记得去掉下面的注释
+    # hx_mi_values = calc_mi(features, inputs, args)
+    hx_mi_values = 0
     hx_cost = time.time()-stt
     
     if rank == 0:
@@ -167,12 +182,13 @@ def main():
             'hy_mean': [all_hy_mi_means[ckpt][0] for ckpt in ckpts],
             'hy_max': [all_hy_mi_maxes[ckpt][0] for ckpt in ckpts],
             'hy_top': [all_hy_mi_topks[ckpt][0] for ckpt in ckpts],
-            'hx_mean': [all_hx_mi_means[ckpt][0] for ckpt in ckpts],
-            'hx_max': [all_hx_mi_maxes[ckpt][0] for ckpt in ckpts],
-            'hx_top': [all_hx_mi_topks[ckpt][0] for ckpt in ckpts],
+            # todo: 记得去注释
+            # 'hx_mean': [all_hx_mi_means[ckpt][0] for ckpt in ckpts],
+            # 'hx_max': [all_hx_mi_maxes[ckpt][0] for ckpt in ckpts],
+            # 'hx_top': [all_hx_mi_topks[ckpt][0] for ckpt in ckpts],
         })
         print(df)
-        df.to_json(f'results_imn{args.num_classes}_neib{args.n_neighbors}_{datetime.datetime.now().strftime("%m-%d %H:%M:%S")}.json')
+        df.to_json(f'results_{args.dataset}_cls{args.num_classes}_neib{args.n_neighbors}_{datetime.datetime.now().strftime("%m-%d %H:%M:%S")}.json')
     
     link.barrier()
     link.finalize()
