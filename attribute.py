@@ -266,10 +266,7 @@ task_scheduler:
 """)
     return AttributeGenderDataset(
         cfg=ED(cfg),
-        root_dir='/attribute/',
-        meta_file='/mnt/lustre/heyinan/gvm_list/gender_test.json',
-        bucket_name='gvm',
-        eval=True,
+        **cfg.val_kwargs
     )
 
 
@@ -299,10 +296,7 @@ task_scheduler:
 """)
     return AttributeAgeDataset(
         cfg=ED(cfg),
-        root_dir='/attribute/',
-        meta_file='/mnt/lustre/heyinan/gvm_list/gender_test.json',
-        bucket_name='gvm',
-        eval=True,
+        **cfg.val_kwargs
     )
 
 
@@ -332,10 +326,7 @@ task_scheduler:
 """)
     return ImageNetDataset(
         cfg=ED(cfg),
-        root_dir='/attribute/',
-        meta_file='/mnt/lustre/heyinan/gvm_list/gender_test.json',
-        bucket_name='gvm',
-        eval=True,
+        **cfg.val_kwargs
     )
 
 
