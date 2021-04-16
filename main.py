@@ -120,7 +120,7 @@ def main():
     labels = torch.cat(labels, dim=0)
     labels = labels.reshape(-1)
     inputs = torch.cat(inputs, dim=0)
-    assert features.shape[0] == labels.shape[0] == inputs.shape[0] == test_len
+    assert features.shape[0] == labels.shape[0] == inputs.shape[0]
     
     if rank == 0:
         print(f'[rk{rank}]: features={features.dtype} {tuple(features.shape)},  labels.shape={labels.dtype} {tuple(labels.shape)},  inputs.shape={inputs.dtype} {tuple(inputs.shape)}')
