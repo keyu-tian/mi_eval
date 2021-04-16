@@ -73,7 +73,7 @@ def main():
         args.batch_size = 64
     
     test_len = len(test_data)
-    test_ld = DataLoader(test_data, batch_size=args.batch_size, shuffle=False, drop_last=False, num_workers=4, pin_memory=True)
+    test_ld = DataLoader(test_data, batch_size=args.batch_size, shuffle=True, drop_last=False, num_workers=4, pin_memory=True)
 
     prefix = os.path.join(os.path.expanduser('~'), 'htl_ckpt')
     ckpts = [
@@ -100,9 +100,13 @@ def main():
         bar = tqdm(test_ld)
     else:
         bar = test_ld
+    tot_bs = 0
     with torch.no_grad():
         for x, y in bar:
             bs = x.shape[0]
+            tot_bs += bs
+            if tot_bs > 8000:
+                break
             h = r50_bb(x.cuda()).cpu()
             y = y.view(bs, 1).int()
             inputs.append(F.avg_pool2d(x.mean(dim=1), kernel_size=4).view(bs, -1))

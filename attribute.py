@@ -266,7 +266,7 @@ task_scheduler:
 """)
     return AttributeGenderDataset(
         cfg=ED(cfg),
-        **cfg.val_kwargs
+        **cfg['val_kwargs']
     )
 
 
@@ -296,7 +296,7 @@ task_scheduler:
 """)
     return AttributeAgeDataset(
         cfg=ED(cfg),
-        **cfg.val_kwargs
+        **cfg['val_kwargs']
     )
 
 
@@ -326,7 +326,7 @@ task_scheduler:
 """)
     return ImageNetDataset(
         cfg=ED(cfg),
-        **cfg.val_kwargs
+        **cfg['val_kwargs']
     )
 
 
