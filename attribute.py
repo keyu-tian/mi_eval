@@ -120,7 +120,9 @@ class ImageNetDataset:
             
             if self.transform is not None:
                 img = self.transform(img)
-            
+            img: torch.Tensor
+            label: int
+            return img, label
             item = {
                 'image': img,
                 'gt': {'global': {
@@ -190,7 +192,9 @@ class AttributeGenderDataset(ImageNetDataset):
             
             if self.transform is not None:
                 img = self.transform(img)
-            
+            img: torch.Tensor
+            label: int
+            return img, label
             item = {
                 'image': img,
                 'gt': {'global': {
