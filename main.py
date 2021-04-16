@@ -77,9 +77,12 @@ def main():
 
     prefix = os.path.join(os.path.expanduser('~'), 'htl_ckpt')
     ckpts = [
-        os.path.join(prefix, 'DY_MTL_LV1_10_R50_convertBB.pth.tar'),
-        os.path.join(prefix, 'DY_MTL_LV1_30_R50_convertBB.pth.tar'),
-        os.path.join(prefix, 'xueshuClip.pth.tar'),
+        # os.path.join(prefix, 'DY_MTL_LV1_10_R50_convertBB.pth.tar'),
+        # os.path.join(prefix, 'DY_MTL_LV1_30_R50_convertBB.pth.tar'),
+        # os.path.join(prefix, 'xueshuClip.pth.tar'),
+        os.path.join(prefix, 'GS_MTL_LV1_10_and_LV2eve_R50.pth.tar'),
+        os.path.join(prefix, 'GS_MTL_LV1_10_and_LV2eve_4K_R50.pth.tar'),
+        # os.path.join(prefix, ''),
     ]
     ckpt_names = [
         os.path.split(ckpt)[-1].replace('.tar', '').replace('.pth', '')
@@ -192,7 +195,7 @@ def main():
             # 'hx_top': [all_hx_mi_topks[ckpt][0] for ckpt in ckpts],
         })
         print(df)
-        df.to_json(f'results_{args.dataset}_cls{args.num_classes}_neib{args.n_neighbors}_{datetime.datetime.now().strftime("%m-%d %H:%M:%S")}.json')
+        df.to_json(f'results_{args.dataset}_cls{args.num_classes}_neib{args.n_neighbors}_{datetime.datetime.now().strftime("%m-%d_%H-%M-%S")}.json')
     
     link.barrier()
     link.finalize()
