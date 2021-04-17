@@ -14,7 +14,7 @@ from tqdm import tqdm
 
 from dataset.attribute import Age, Gender, Liveness
 from dataset.imagenet import SubImageNetDataset
-from mi.mi_calc import calc_MI_features_labels, calc_MI_features_inputs
+from mi.mi_calc import calc_MI_features_labels, calc_MI_features_inputs, get_random_MI_features_labels_mean, get_random_MI_features_inputs_mean
 from mi.mi_report import report
 from model import load_r50backbone
 
@@ -96,6 +96,9 @@ def main():
             if rank == 0:
                 bar.set_description_str('[extracting features]')
                 bar.set_postfix(OrderedDict({'tot_bs': tot_bs, 'cur_bs': bs, 'ckpt': ckpt_name}))
+    if rank == 0:
+        bar.clear()
+        bar.close()
     
     features = torch.cat(features, dim=0)
     labels = torch.cat(labels, dim=0).reshape(-1)
@@ -120,6 +123,11 @@ def main():
                 f'[rk{rank}]: ckpt={ckpt}\n'
                 f'I(h, y):    mean={hy_mean:.3g},  max={hy_max:.3g},  top={hy_top:.3g}'
             )
+    if rank == 0:
+        print(
+            f'[rk{rank}]: == RANDOM ==\n'
+            f'I(h, y):    mean={get_random_MI_features_labels_mean(features, labels, cfg.n_neighbors):.3g}'
+        )
     
     stt = time.time()
     hx_values = calc_MI_features_inputs(rank == 0, features, inputs, cfg.n_neighbors)
@@ -136,6 +144,11 @@ def main():
                 f'[rk{rank}]: ckpt={ckpt}\n'
                 f'I(h, x):    mean={hx_mean:.3g},  max={hx_max:.3g},  top={hx_top:.3g}'
             )
+    if rank == 0:
+        print(
+            f'[rk{rank}]: == RANDOM ==\n'
+            f'I(h, x):    mean={get_random_MI_features_inputs_mean(features, labels, cfg.n_neighbors):.3g}'
+        )
     
     time.sleep(1)
     report(cfg, hy_mean, hy_max, hy_top, hx_mean, hx_max, hx_top)

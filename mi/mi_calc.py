@@ -15,10 +15,13 @@ def __calc_MI_h_x(arg):
     return np.mean(sorted(mi_values, reverse=True)[:top_10_percent]).item()
 
 
+def get_random_MI_features_inputs_mean(features: torch.Tensor, inputs: torch.Tensor, n_neighbors: int):
+    return np.mean(mutual_info_regression(features, torch.randn(features.shape[0]), n_neighbors=n_neighbors))
+    
+
 def calc_MI_features_inputs(verbose: bool, features: torch.Tensor, inputs: torch.Tensor, n_neighbors: int):
     num_data, num_inp_dim = inputs.shape
     num_targets = 23
-    # print(f'idx={torch.linspace(0, num_inp_dim - 1, num_targets, dtype=torch.long)}')
     regression_targets = inputs[:, torch.linspace(0, num_inp_dim - 1, num_targets, dtype=torch.long)].T.contiguous()
     # regression_targets.shape: (num_targets, num_data)
     args = [(features, targets, n_neighbors) for targets in regression_targets]
@@ -44,6 +47,10 @@ def calc_MI_features_inputs(verbose: bool, features: torch.Tensor, inputs: torch
 
 def calc_MI_features_labels(features: torch.Tensor, labels: torch.Tensor, n_neighbors: int):
     return mutual_info_classif(features, labels, n_neighbors=n_neighbors)
+
+
+def get_random_MI_features_labels_mean(features: torch.Tensor, labels: torch.Tensor, n_neighbors: int):
+    return np.mean(mutual_info_classif(features, torch.randint(0, labels.max().item()+1, labels.shape).type_as(labels), n_neighbors=n_neighbors))
 
 
 def speed_test():
