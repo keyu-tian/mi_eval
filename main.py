@@ -107,22 +107,20 @@ def main():
     stt = time.time()
     hy_values = calc_MI_features_labels(features, labels, cfg.n_neighbors)
     hy_cost = time.time() - stt
+    if rank == 0:
+        print(f'[rk{rank}]: I(h, y) time cost = {hy_cost:.2f}s ({hy_cost / 60:.2f}min)')
     
     stt = time.time()
     hx_values = calc_MI_features_inputs(rank == 0, features, inputs, cfg.n_neighbors)
     hx_cost = time.time() - stt
+    if rank == 0:
+        print(f'[rk{rank}]: I(h, x) time cost = {hx_cost:.2f}s ({hx_cost / 60:.2f}min)')
     
     assert len(hy_values) == len(hx_values)
-    
-    if rank == 0:
-        print(f'[rk{rank}]: I(h, y) time cost = {hy_cost:.2f}s ({hy_cost / 60:.2f}min)')
-        print(f'[rk{rank}]: I(h, x) time cost = {hx_cost:.2f}s ({hx_cost / 60:.2f}min)')
+    hy_max, hx_max = max(hy_values), max(hx_values)
     hy_mean, hx_mean = np.mean(hy_values).item(), np.mean(hx_values).item()
-    
     hy_top = np.mean(sorted(hy_values, reverse=True)[:max(1, round(len(hy_values) * 0.1))]).item()
     hx_top = np.mean(sorted(hx_values, reverse=True)[:max(1, round(len(hx_values) * 0.1))]).item()
-    
-    hy_max, hx_max = max(hy_values), max(hx_values)
     
     for i in range(len(ckpts)):
         if ckpt_idx == i:
