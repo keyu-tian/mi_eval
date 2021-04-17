@@ -1,11 +1,8 @@
-from pprint import pformat
-
 import torch.nn as nn
 import math
 import torch
 
 # will be overwritten during runtime
-from modified_resbackbone import modified_res50backbone
 
 BN = torch.nn.BatchNorm2d
 Conv2d = torch.nn.Conv2d
@@ -158,39 +155,4 @@ class ResBackbone(nn.Module):
         feature = torch.flatten(x, 1)    # pre_fc: (B, fea_dim)
         return feature
 
-
-def load_r50backbone(ckpt: str, norm_func=nn.BatchNorm2d, conv_func=nn.Conv2d):
-    d = torch.load(ckpt, map_location='cpu')
-    if 'state_dict' in d.keys():
-        d = d['state_dict']
-    if 'module.backbone.conv1.weight' in d.keys():
-        d = {
-            k.replace('module.backbone.', ''): v
-            for k, v in d.items() if k.startswith('module.backbone.')
-        }
-    elif 'backbone.conv1.weight' in d.keys():
-        d = {
-            k.replace('backbone.', ''): v
-            for k, v in d.items() if k.startswith('backbone.')
-        }
-    
-    assert 'conv1.weight' in d.keys(), f'strange keys of the ckpt:\n{list(d.keys())}'
-        
-    conv1_shape = d['conv1.weight'].shape
-    deep_stem = conv1_shape[0] == 32
-    enable_attnpool = 'attnpool.k_proj.weight' in d
-    
-    if deep_stem:
-        r50_bb, warning = modified_res50backbone(clip_pretrain_path=ckpt, enable_attnpool=enable_attnpool)
-    else:
-        r50_bb = ResBackbone(Bottleneck, [3, 4, 6, 3], norm_func=norm_func, conv_func=conv_func)
-        msg = r50_bb.load_state_dict(d, strict=False)
-        unexpected_missing = [k for k in msg.missing_keys if not k.startswith('fc.')]
-        assert len(unexpected_missing) == 0, f'unexpected msg.missing_keys:\n{pformat(unexpected_missing)}'
-        unexpected_extra = msg.unexpected_keys
-        if len(msg.unexpected_keys):
-            warning = f'[warning] msg.unexpected_keys:\n{pformat(unexpected_extra)}'
-        else:
-            warning = ''
-    return r50_bb, warning
 
