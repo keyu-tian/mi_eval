@@ -117,7 +117,7 @@ def main():
             time.sleep(0.1 * rank)
             print(
                 f'[rk{rank}]: ckpt={ckpt}\n'
-                f'I(h, y):    mean={hy_mean:.3g},  max={hy_max:.3g},  top={hy_top:.3g}\n'
+                f'I(h, y):    mean={hy_mean:.3g},  max={hy_max:.3g},  top={hy_top:.3g}'
             )
         link.barrier()
     
