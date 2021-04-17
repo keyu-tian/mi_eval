@@ -24,7 +24,7 @@ def calc_MI_features_inputs(verbose: bool, features: torch.Tensor, inputs: torch
     args = [(features, targets, n_neighbors) for targets in regression_targets]
     assert len(args) == num_targets
     
-    P = min(cpu_count(), 4)
+    P = min(cpu_count(), 8)
     if P >= 4:
         with Pool(P) as pool:
             results = list(pool.imap(__calc_MI_h_x, args, chunksize=1))
