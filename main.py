@@ -86,11 +86,11 @@ def main():
         for x, y in bar:
             bs = x.shape[0]
             tot_bs += bs
-            if tot_bs > 2000:  # calc MI on a subset for saving time
+            if tot_bs > 5000:  # calc MI on a subset for saving time
                 break
             h = r50_bb(x.cuda()).cpu()
             y = y.view(bs, 1).int()
-            inputs.append(F.avg_pool2d(x, kernel_size=8).view(bs, -1))
+            inputs.append(F.avg_pool2d(x, kernel_size=6).view(bs, -1))
             features.append(h)
             labels.append(y)
             if rank == 0:
@@ -103,7 +103,7 @@ def main():
     assert features.shape[0] == labels.shape[0] == inputs.shape[0]
     
     if rank == 0:
-        print(f'[rk{rank}]: features={features.dtype} {tuple(features.shape)},  labels.shape={labels.dtype} {tuple(labels.shape)},  inputs.shape={inputs.dtype} {tuple(inputs.shape)}')
+        print(f'\n[rk{rank}]: features={features.dtype} {tuple(features.shape)},  labels.shape={labels.dtype} {tuple(labels.shape)},  inputs.shape={inputs.dtype} {tuple(inputs.shape)}')
     
     stt = time.time()
     hy_values = calc_MI_features_labels(features, labels, cfg.n_neighbors)
