@@ -110,25 +110,29 @@ def main():
     hy_cost = time.time() - stt
     if rank == 0:
         print(f'[rk{rank}]: I(h, y) time cost = {hy_cost:.2f}s ({hy_cost / 60:.2f}min)')
-    
-    stt = time.time()
-    hx_values = calc_MI_features_inputs(rank == 0, features, inputs, cfg.n_neighbors)
-    hx_cost = time.time() - stt
-    if rank == 0:
-        print(f'[rk{rank}]: I(h, x) time cost = {hx_cost:.2f}s ({hx_cost / 60:.2f}min)')
-    
-    assert len(hy_values) == len(hx_values)
-    hy_max, hx_max = max(hy_values), max(hx_values)
-    hy_mean, hx_mean = np.mean(hy_values).item(), np.mean(hx_values).item()
+    hy_mean, hy_max = np.mean(hy_values).item(), max(hy_values)
     hy_top = np.mean(sorted(hy_values, reverse=True)[:max(1, round(len(hy_values) * 0.1))]).item()
-    hx_top = np.mean(sorted(hx_values, reverse=True)[:max(1, round(len(hx_values) * 0.2))]).item()
-    
     for i in range(len(ckpts)):
         if ckpt_idx == i:
             time.sleep(0.1 * rank)
             print(
                 f'[rk{rank}]: ckpt={ckpt}\n'
                 f'I(h, y):    mean={hy_mean:.3g},  max={hy_max:.3g},  top={hy_top:.3g}\n'
+            )
+        link.barrier()
+    
+    stt = time.time()
+    hx_values = calc_MI_features_inputs(rank == 0, features, inputs, cfg.n_neighbors)
+    hx_cost = time.time() - stt
+    if rank == 0:
+        print(f'[rk{rank}]: I(h, x) time cost = {hx_cost:.2f}s ({hx_cost / 60:.2f}min)')
+    hx_mean, hx_max = np.mean(hx_values).item(), max(hx_values)
+    hx_top = np.mean(sorted(hx_values, reverse=True)[:max(1, round(len(hx_values) * 0.2))]).item()
+    for i in range(len(ckpts)):
+        if ckpt_idx == i:
+            time.sleep(0.1 * rank)
+            print(
+                f'[rk{rank}]: ckpt={ckpt}\n'
                 f'I(h, x):    mean={hx_mean:.3g},  max={hx_max:.3g},  top={hx_top:.3g}'
             )
         link.barrier()
