@@ -49,7 +49,7 @@ def calc_MI_features_labels(features: torch.Tensor, labels: torch.Tensor, n_neig
 def speed_test():
     import time
     stt = time.time()
-    print(calc_MI_features_inputs(True, torch.rand((300, 128)), torch.rand((300, 2330)), 15))
+    print(calc_MI_features_inputs(True, torch.rand((3840, 2048)), torch.rand((3840, 4107)), 15))
     print(f'time cost: {time.time()-stt:.2f}s')
 
 

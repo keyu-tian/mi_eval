@@ -138,7 +138,7 @@ def main():
         link.barrier()
     
     time.sleep(1)
-    report(hy_mean, hy_max, hy_top, hx_mean, hx_max, hx_top)
+    report(cfg, hy_mean, hy_max, hy_top, hx_mean, hx_max, hx_top)
     
     link.barrier()
     link.finalize()
