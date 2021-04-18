@@ -7,4 +7,4 @@ checkpoints: [
    /mnt/lustre/tiankeyu/htl_ckpt/GS_MTL_LV1_10_and_LV2eve_R50.pth.tar,
    /mnt/lustre/tiankeyu/htl_ckpt/GS_MTL_LV1_10_and_LV2eve_4K_R50.pth.tar,
 ]   # should be less than num_gpus
-n_neighbors: 15
+n_neighbors: 12

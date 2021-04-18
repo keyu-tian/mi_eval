@@ -1,9 +1,11 @@
+import datetime
 import os
 import time
 from collections import OrderedDict
 from pprint import pformat
 
 import numpy as np
+import pytz
 import torch
 import torch.nn.functional as F
 import yaml
@@ -24,6 +26,10 @@ except:
     import spring.linklink as link
 
 
+def time_str():
+    return datetime.datetime.now(tz=pytz.timezone('Asia/Shanghai')).strftime('[%m-%d %H:%M:%S]')
+
+
 def link_init():
     dev_idx = int(os.environ['SLURM_LOCALID'])
     torch.cuda.set_device(dev_idx)
@@ -39,7 +45,7 @@ def main():
     
     rank, world_size = link_init()
     if rank == 0:
-        print(f'[rk{rank}]: cfg=\n{pformat(dict(cfg))}\n')
+        print(f'{time_str()}[rk{rank}]: cfg=\n{pformat(dict(cfg))}\n')
     
     test_transform = transforms.Compose([
         transforms.Resize(256),
@@ -76,7 +82,7 @@ def main():
     for rk in range(len(ckpts)):
         link.barrier()
         if rk == rank:
-            print(f'[rk{rank}, {ckpt_name}]: {warning or "nothing"}')
+            print(f'{time_str()}[rk{rank}, {ckpt_name}]: {warning or "nothing"}')
     r50_bb = r50_bb.cuda()
     r50_bb.eval()
     
@@ -86,7 +92,7 @@ def main():
         for x, y in bar:
             bs = x.shape[0]
             tot_bs += bs
-            if tot_bs > 3000:  # calc MI on a subset for saving time
+            if tot_bs > 5000:  # calc MI on a subset for saving time
                 break
             h = r50_bb(x.cuda()).cpu()
             y = y.view(bs, 1).int()
@@ -106,17 +112,17 @@ def main():
     assert features.shape[0] == labels.shape[0] == inputs.shape[0]
     
     if rank == 0:
-        print(f'\n[rk{rank}]: features={features.dtype} {tuple(features.shape)},  labels.shape={labels.dtype} {tuple(labels.shape)},  inputs.shape={inputs.dtype} {tuple(inputs.shape)}')
+        print(f'\n{time_str()}[rk{rank}]: features={features.dtype} {tuple(features.shape)},  labels.shape={labels.dtype} {tuple(labels.shape)},  inputs.shape={inputs.dtype} {tuple(inputs.shape)}')
     
     stt = time.time()
     hy_values = calc_MI_features_labels(features, labels, cfg.n_neighbors)
     hy_cost = time.time() - stt
     if rank == 0:
-        print(f'[rk{rank}]: I(h, y) time cost = {hy_cost:.2f}s ({hy_cost / 60:.2f}min)')
+        print(f'{time_str()}[rk{rank}]: I(h, y) time cost = {hy_cost:.2f}s ({hy_cost / 60:.2f}min)')
     hy_random = get_random_MI_features_labels_mean(features, labels, cfg.n_neighbors)
     if rank == 0:
         print(
-            f'[rk{rank}]: == RANDOM ==\n'
+            f'{time_str()}[rk{rank}]: == RANDOM ==\n'
             f'I(h, y):    mean={hy_random:.3g}'
         )
     hy_values = [abs(v / hy_random) ** 0.5 for v in hy_values]
@@ -127,7 +133,7 @@ def main():
         if ckpt_idx == i:
             time.sleep(0.1 * rank)
             print(
-                f'[rk{rank}]: ckpt={ckpt}\n'
+                f'{time_str()}[rk{rank}]: ckpt={ckpt}\n'
                 f'I(h, y):    mean={hy_mean:.3g},  max={hy_max:.3g},  top={hy_top:.3g}'
             )
     
@@ -135,11 +141,11 @@ def main():
     hx_values = calc_MI_features_inputs(rank == 0, features, inputs, cfg.n_neighbors)
     hx_cost = time.time() - stt
     if rank == 0:
-        print(f'[rk{rank}]: I(h, x) time cost = {hx_cost:.2f}s ({hx_cost / 60:.2f}min)')
+        print(f'{time_str()}[rk{rank}]: I(h, x) time cost = {hx_cost:.2f}s ({hx_cost / 60:.2f}min)')
     hx_random = get_random_MI_features_inputs_mean(features, labels, cfg.n_neighbors)
     if rank == 0:
         print(
-            f'[rk{rank}]: == RANDOM ==\n'
+            f'{time_str()}[rk{rank}]: == RANDOM ==\n'
             f'I(h, x):    mean={hx_random:.3g}'
         )
     hx_values = [abs(v / hx_random) ** 0.5 for v in hx_values]
@@ -150,7 +156,7 @@ def main():
         if ckpt_idx == i:
             time.sleep(0.1 * rank)
             print(
-                f'[rk{rank}]: ckpt={ckpt}\n'
+                f'{time_str()}[rk{rank}]: ckpt={ckpt}\n'
                 f'I(h, x):    mean={hx_mean:.3g},  max={hx_max:.3g},  top={hx_top:.3g}'
             )
     

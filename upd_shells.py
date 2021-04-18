@@ -21,20 +21,10 @@ if __name__ == '__main__':
             fp.write(
                 ctt.replace(
 """
-checkpoints: [
-   /mnt/lustre/tiankeyu/htl_ckpt/GS_MTL_LV1_10_and_LV2eve_R50.pth.tar,
-   /mnt/lustre/tiankeyu/htl_ckpt/GS_MTL_LV1_10_and_LV2eve_4K_R50.pth.tar,
-   /mnt/lustre/tiankeyu/htl_ckpt/DY_MTL_LV1_10_R50_convertBB.pth.tar,
-   /mnt/lustre/tiankeyu/htl_ckpt/xueshuClip.pth.tar,
-]   # should be less than num_gpus
+n_neighbors: 15
 """,
 """
-checkpoints: [
-   /mnt/lustre/tiankeyu/htl_ckpt/GS_MTL_LV1_10_and_LV2eve_R50.pth.tar,
-   /mnt/lustre/tiankeyu/htl_ckpt/GS_MTL_LV1_10_and_LV2eve_4K_R50.pth.tar,
-   /mnt/lustre/tiankeyu/htl_ckpt/DY_MTL_LV1_10_R50_convertBB.pth.tar,
-   /mnt/lustre/tiankeyu/htl_ckpt/xueshuClip.pth.tar,
-]   # len(checkpoints) should be less than num_gpus
+n_neighbors: 12
 """,
                 )
             )
