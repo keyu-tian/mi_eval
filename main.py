@@ -92,7 +92,7 @@ def main():
         for x, y in bar:
             bs = x.shape[0]
             tot_bs += bs
-            if tot_bs > 4000:  # calc MI on a subset for saving time
+            if tot_bs > 8000:  # calc MI on a subset for saving time
                 break
             h = r50_bb(x.cuda()).cpu()
             y = y.view(bs, 1).int()
