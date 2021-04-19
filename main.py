@@ -137,29 +137,30 @@ def main():
                 f'I(h, y):    mean={hy_mean:.3g},  max={hy_max:.3g},  top={hy_top:.3g}'
             )
     
-    stt = time.time()
-    hx_values = calc_MI_features_inputs(rank == 0, features, inputs, cfg.n_neighbors)
-    hx_cost = time.time() - stt
-    if rank == 0:
-        print(f'{time_str()}[rk{rank}]: I(h, x) time cost = {hx_cost:.2f}s ({hx_cost / 60:.2f}min)')
-    hx_random = get_random_MI_features_inputs_mean(features, labels, cfg.n_neighbors)
-    if rank == 0:
-        print(
-            f'{time_str()}[rk{rank}]: == RANDOM ==\n'
-            f'I(h, x):    mean={hx_random:.3g}'
-        )
-    hx_values = [abs(v / hx_random) ** 0.5 for v in hx_values]
-    hx_mean, hx_max = np.mean(hx_values).item(), max(hx_values)
-    hx_top = np.mean(sorted(hx_values, reverse=True)[:max(1, round(len(hx_values) * 0.2))]).item()
-    for i in range(len(ckpts)):
-        link.barrier()
-        if ckpt_idx == i:
-            time.sleep(0.1 * rank)
-            print(
-                f'{time_str()}[rk{rank}]: ckpt={ckpt}\n'
-                f'I(h, x):    mean={hx_mean:.3g},  max={hx_max:.3g},  top={hx_top:.3g}'
-            )
+    # stt = time.time()
+    # hx_values = calc_MI_features_inputs(rank == 0, features, inputs, cfg.n_neighbors)
+    # hx_cost = time.time() - stt
+    # if rank == 0:
+    #     print(f'{time_str()}[rk{rank}]: I(h, x) time cost = {hx_cost:.2f}s ({hx_cost / 60:.2f}min)')
+    # hx_random = get_random_MI_features_inputs_mean(features, labels, cfg.n_neighbors)
+    # if rank == 0:
+    #     print(
+    #         f'{time_str()}[rk{rank}]: == RANDOM ==\n'
+    #         f'I(h, x):    mean={hx_random:.3g}'
+    #     )
+    # hx_values = [abs(v / hx_random) ** 0.5 for v in hx_values]
+    # hx_mean, hx_max = np.mean(hx_values).item(), max(hx_values)
+    # hx_top = np.mean(sorted(hx_values, reverse=True)[:max(1, round(len(hx_values) * 0.2))]).item()
+    # for i in range(len(ckpts)):
+    #     link.barrier()
+    #     if ckpt_idx == i:
+    #         time.sleep(0.1 * rank)
+    #         print(
+    #             f'{time_str()}[rk{rank}]: ckpt={ckpt}\n'
+    #             f'I(h, x):    mean={hx_mean:.3g},  max={hx_max:.3g},  top={hx_top:.3g}'
+    #         )
     
+    hx_mean = hx_max = hx_top = -1
     time.sleep(1)
     report(cfg, hy_mean, hy_max, hy_top, hx_mean, hx_max, hx_top)
     
