@@ -21,7 +21,7 @@ def get_random_MI_features_inputs_mean(features: torch.Tensor, inputs: torch.Ten
 
 def calc_MI_features_inputs(verbose: bool, features: torch.Tensor, inputs: torch.Tensor, n_neighbors: int):
     num_data, num_inp_dim = inputs.shape
-    num_targets = 29
+    num_targets = 17
     regression_targets = inputs[:, torch.linspace(0, num_inp_dim - 1, num_targets, dtype=torch.long)].T.contiguous()
     # regression_targets.shape: (num_targets, num_data)
     args = [(features, targets, n_neighbors) for targets in regression_targets]
