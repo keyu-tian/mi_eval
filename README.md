@@ -25,3 +25,6 @@
 ```
 
 （请主要参考 top 指标）
+
+- 结果也会以 `json` 格式，将 `pandas.DataFrame` 保存在当前文件夹内，例如 `results_gender_neib12_04-19_21-44-37.json`。
+- 使用 `pandas.read_json(filename)` 可以加载这个 `DataFrame`。
