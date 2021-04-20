@@ -1,8 +1,9 @@
 dataset: age
 batch_size: 256
 checkpoints: [
-   /mnt/lustre/tiankeyu/htl_ckpt/DY_MTL_LV1_10_R50_convertBB.pth.tar,
-   /mnt/lustre/tiankeyu/htl_ckpt/DY_MTL_LV1_30_R50_convertBB.pth.tar,
-   /mnt/lustre/tiankeyu/htl_ckpt/DF_MTL_LV1_39_R50_convertBB.pth.tar,
+   /mnt/lustre/share/tiankeyu/htl_ckpt/DY_MTL_LV1_10_R50_convertBB.pth.tar,
+   /mnt/lustre/share/tiankeyu/htl_ckpt/DY_MTL_LV1_30_R50_convertBB.pth.tar,
+   /mnt/lustre/share/tiankeyu/htl_ckpt/DF_MTL_LV1_39_R50_convertBB.pth.tar,
 ]   # should be less than num_gpus
 n_neighbors: 12
+calc_hx: False

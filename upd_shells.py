@@ -20,12 +20,8 @@ if __name__ == '__main__':
         with open(path, 'w', encoding='utf-8') as fp:
             fp.write(
                 ctt.replace(
-"""
-n_neighbors: 15
-""",
-"""
-n_neighbors: 12
-""",
+"""/mnt/lustre/tiankeyu/htl_ckpt""",
+"""/mnt/lustre/share/tiankeyu/htl_ckpt""",
                 )
             )
     
