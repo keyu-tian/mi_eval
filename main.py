@@ -15,7 +15,7 @@ from torchvision.transforms import transforms
 from tqdm import tqdm
 
 from dataset.industry_dataset import Age, Gender, Liveness
-from dataset.imagenet import SubImageNetDataset
+from dataset.subimagenet import SubImageNetDataset
 from mi.mi_calc import calc_MI_features_labels, calc_MI_features_inputs, get_random_MI_features_labels_mean, get_random_MI_features_inputs_mean
 from mi.mi_report import report
 from model import load_r50backbone
