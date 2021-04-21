@@ -22,7 +22,12 @@ def pil_loader(img_bytes):
 
 class ImageNetDataset(Dataset):
     # /mnt/lustre/share/images
-    def __init__(self, root: str, train, transform, download=False, read_from='mc'):
+    def __init__(self, train, transform, download=False, read_from='mc'):
+        root = list(filter(
+            os.path.exists,
+            ['/mnt/lustre/share/images', '/mnt/lustrenew/share/images',
+             '/mnt/lustre2/share/images', '/mnt/lustreold/share/images']
+        ))[0]
         root = pathlib.Path(root)
         tr_va_root, tr_va_meta = root / 'train', root / 'meta' / 'train.txt'
         te_root, te_meta = root / 'val', root / 'meta' / 'val.txt'
@@ -137,8 +142,8 @@ _idx_1300images = [
 
 
 class SubImageNetDataset(ImageNetDataset):
-    def __init__(self, num_classes, root, train, transform, download=False, read_from='mc'):
-        super(SubImageNetDataset, self).__init__(root, train, transform, download, read_from)
+    def __init__(self, num_classes, train, transform, download=False, read_from='mc'):
+        super(SubImageNetDataset, self).__init__(train, transform, download, read_from)
         global _idx_1300images
         idx = _idx_1300images[:num_classes]
         

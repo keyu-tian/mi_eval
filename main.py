@@ -140,7 +140,6 @@ def get_data(cfg, r50_bb, verbose=False):
     data_clz, data_kw = {
         'subimagenet': (SubImageNetDataset, dict(
             num_classes=cfg.get('subimagenet_num_classes', 50),
-            root='/mnt/lustre/share/images',
             train=False, transform=test_transform
         )),
         'liveness': (Liveness, dict()),
