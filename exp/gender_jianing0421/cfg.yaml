@@ -1,14 +1,14 @@
 dataset: gender
 batch_size: 256
 checkpoints: [
-   /mnt/lustre/tengjianing/modelzoo/MM/dy/DF_MTL_LV1_10_R50_re_convertBB.pth.tar,
-   /mnt/lustre/tengjianing/modelzoo/MM/gs/GS_MTL_LV1_10_and_LV2eve_R50_convertBB.pth.tar,
-   /mnt/lustre/tengjianing/modelzoo/MM/gs/GS_MTL_LV1_10_and_LV2eve_Xformer_R50_convertBB.pth.tar,
-   /mnt/lustre/tengjianing/modelzoo/MM/gs/GS_MTL_LV1_10_and_LV2eve_4K_R50_convertBB.pth.tar,
-   /mnt/lustre/tengjianing/modelzoo/MM/gs/GS_MTL_LV1_10_and_LV2eve_4K_and_LV3clip_R50_convertBB.pth.tar,
-   /mnt/lustre/tengjianing/modelzoo/CLIP/YG_clip_res50_yfcc15m_convertBB.pth,
-   /mnt/lustre/tengjianing/modelzoo/CLIP/clip_res50_50M_noLiveness_convertBB.pth.tar,
-   /mnt/lustre/tengjianing/modelzoo/CLIP/xueshuClip.pth.tar,
+   /mnt/lustre/tiankeyu/htl_ckpt/DF_MTL_LV1_10_R50_re_convertBB.pth.tar,
+   /mnt/lustre/tiankeyu/htl_ckpt/GS_MTL_LV1_10_and_LV2eve_R50_convertBB.pth.tar,
+   /mnt/lustre/tiankeyu/htl_ckpt/GS_MTL_LV1_10_and_LV2eve_Xformer_R50_convertBB.pth.tar,
+   /mnt/lustre/tiankeyu/htl_ckpt/GS_MTL_LV1_10_and_LV2eve_4K_R50_convertBB.pth.tar,
+   /mnt/lustre/tiankeyu/htl_ckpt/GS_MTL_LV1_10_and_LV2eve_4K_and_LV3clip_R50_convertBB.pth.tar,
+   /mnt/lustre/tiankeyu/htl_ckpt/YG_clip_res50_yfcc15m_convertBB.pth,
+   /mnt/lustre/tiankeyu/htl_ckpt/clip_res50_50M_noLiveness_convertBB.pth.tar,
+   /mnt/lustre/tiankeyu/htl_ckpt/xueshuClip.pth.tar,
 ]   # should be less than num_gpus
 n_neighbors: 12
 calc_hx: False
