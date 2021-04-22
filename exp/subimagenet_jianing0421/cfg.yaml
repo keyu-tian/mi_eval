@@ -12,4 +12,5 @@ checkpoints: [
    /mnt/lustre/tiankeyu/htl_ckpt/xueshuClip.pth.tar,
 ]   # should be no more than num_gpus
 n_neighbors: 12
+train_set: False
 calc_hx: False

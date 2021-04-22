@@ -20,8 +20,11 @@ if __name__ == '__main__':
         with open(path, 'w', encoding='utf-8') as fp:
             fp.write(
                 ctt.replace(
-"""should be less than num_gpus""",
-"""should be no more than num_gpus""",
+"""n_neighbors: 12
+calc_hx: False""",
+"""n_neighbors: 12
+train_set: False
+calc_hx: False""",
                 )
             )
     

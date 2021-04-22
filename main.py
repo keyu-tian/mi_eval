@@ -43,6 +43,7 @@ def main():
         cfg = EasyDict(yaml.safe_load(fin))
     cfg.dataset = str(cfg.dataset).strip().lower()
     cfg.n_neighbors = cfg.get('n_neighbors', 10)
+    cfg.train_set = cfg.get('train_set', False)
 
     rank, world_size = link_init()
     ckpts = cfg.checkpoints
@@ -140,11 +141,11 @@ def get_data(cfg, r50_bb, verbose=False):
     data_clz, data_kw = {
         'subimagenet': (SubImageNetDataset, dict(
             num_classes=cfg.get('subimagenet_num_classes', 50),
-            train=False, transform=test_transform
+            train=cfg.train_set, transform=test_transform
         )),
-        'liveness': (Liveness, dict()),
-        'gender': (Gender, dict()),
-        'age': (Age, dict()),
+        'liveness': (Liveness, dict(train=cfg.train_set)),
+        'gender': (Gender, dict(train=cfg.train_set)),
+        'age': (Age, dict(train=cfg.train_set)),
     }[cfg.dataset]
     test_data = data_clz(**data_kw)
     test_ld = DataLoader(test_data, batch_size=cfg.batch_size, shuffle=True, drop_last=False, num_workers=2, pin_memory=True)

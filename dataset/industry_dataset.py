@@ -138,7 +138,8 @@ class ImageNetDataset:
             return self[idx - 1]
     
     def _build_transform(self):
-        if self.eval:
+        # if self.eval:
+        if True:
             transform = torchvision.transforms.Compose([
                 torchvision.transforms.Resize(256),
                 torchvision.transforms.CenterCrop(224),
@@ -244,7 +245,7 @@ def trim_key(key):
         return key
 
 
-def Gender():
+def Gender(train: bool):
     cfg = yaml.safe_load("""
 tasks:
     global:
@@ -253,13 +254,14 @@ kwargs:
     root_dir: /attribute/
     meta_file: /mnt/lustre/heyinan/gvm_list/gender_train_major.json
     bucket_name: gvm
+    eval: True
 val_kwargs:
     root_dir: /attribute/
     meta_file: /mnt/lustre/heyinan/gvm_list/gender_test.json
     bucket_name: gvm
     eval: True
 batch_size:
-    train: 32
+    train: 64
     val: 64
 task_scheduler:
     weight: 1
@@ -270,11 +272,11 @@ task_scheduler:
 """)
     return AttributeGenderDataset(
         cfg=ED(cfg),
-        **cfg['val_kwargs']
+        **cfg['kwargs' if train else 'val_kwargs']
     )
 
 
-def Age():
+def Age(train: bool):
     cfg = yaml.safe_load("""
 tasks:
     global:
@@ -283,13 +285,14 @@ kwargs:
     root_dir: /attribute/
     meta_file:  /mnt/lustre/heyinan/gvm_list/age_train_major.json
     bucket_name: gvm
+    eval: True
 val_kwargs:
     root_dir: /attribute/
     meta_file:  /mnt/lustre/heyinan/gvm_list/age_test.json
     bucket_name: gvm
     eval: True
 batch_size:
-    train: 32
+    train: 64
     val: 64
 task_scheduler:
     weight: 1
@@ -300,11 +303,11 @@ task_scheduler:
 """)
     return AttributeAgeDataset(
         cfg=ED(cfg),
-        **cfg['val_kwargs']
+        **cfg['kwargs' if train else 'val_kwargs']
     )
 
 
-def Liveness():
+def Liveness(train: bool):
     cfg = yaml.safe_load("""
 tasks:
     global:
@@ -313,13 +316,14 @@ kwargs:
     root_dir: /
     meta_file: /mnt/lustre/heyinan/gvm_list/liveness_4M.train
     bucket_name: gvm
+    eval: True
 val_kwargs:
     root_dir: /
     meta_file: /mnt/lustre/heyinan/gvm_list/liveness.test
     bucket_name: gvm
     eval: True
 batch_size:
-    train: 32
+    train: 64
     val: 64
 task_scheduler:
     weight: 1
@@ -330,7 +334,7 @@ task_scheduler:
 """)
     return ImageNetDataset(
         cfg=ED(cfg),
-        **cfg['val_kwargs']
+        **cfg['kwargs' if train else 'val_kwargs']
     )
 
 
