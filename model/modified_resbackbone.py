@@ -10,20 +10,15 @@ __all__ = ['modified_res50backbone']
 BN = nn.BatchNorm2d
 
 
-def load_clip_state_vision_model(model, ckpt_path, warning):
-    try:
-        ckpt_state = torch.load(ckpt_path, map_location='cpu')
-    except:
-        ckpt_state = torch.jit.load(ckpt_path, map_location='cpu')
+def load_clip_state_vision_model(model, ckpt_state: dict, warning):
     if 'state_dict' in ckpt_state:
         # our gvm-clip checkpoint
         ckpt_state = ckpt_state['state_dict']
-        prefix = 'module.vision_model.'
-    elif any([_.startswith('visual.') for _ in ckpt_state.keys()]):
-        # OpenAI checkpoint
-        prefix = 'visual.'
+    for p in ['module.vision_model.', 'module.backbone.', 'visual.', 'backbone.']:
+        if f'{p}conv1.weight' in ckpt_state.keys():
+            prefix = p
+            break
     else:
-        # cleaned CLIP checkpoint, no prefix
         prefix = ''
 
     warning.append('======= loading CLIP model state... =======')
