@@ -86,7 +86,7 @@ def main():
         )
     hy_values = [abs(v / hy_random) ** 0.5 for v in hy_values]      # normalize MI values
     hy_mean, hy_max = np.mean(hy_values).item(), max(hy_values)
-    hy_top = np.mean(sorted(hy_values, reverse=True)[:max(1, round(len(hy_values) * 0.1))]).item()
+    hy_top = np.mean(sorted(hy_values, reverse=True)[:max(2, round(len(hy_values) * 0.1))]).item()
     for i in range(len(ckpts)):
         link.barrier()
         if ckpt_idx == i:
@@ -111,7 +111,7 @@ def main():
             )
         hx_values = [abs(v / hx_random) ** 0.5 for v in hx_values]  # normalize MI values
         hx_mean, hx_max = np.mean(hx_values).item(), max(hx_values)
-        hx_top = np.mean(sorted(hx_values, reverse=True)[:max(1, round(len(hx_values) * 0.2))]).item()
+        hx_top = np.mean(sorted(hx_values, reverse=True)[:max(2, round(len(hx_values) * 0.15))]).item()
         for i in range(len(ckpts)):
             link.barrier()
             if ckpt_idx == i:

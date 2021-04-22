@@ -11,12 +11,17 @@ from sklearn.feature_selection import mutual_info_regression, mutual_info_classi
 def __calc_MI_h_x(arg):
     features, targets, n_neighbors = arg
     mi_values = mutual_info_regression(features, targets, n_neighbors=n_neighbors)
-    top_10_percent = max(1, round(len(mi_values) * 0.1))
+    top_10_percent = max(2, round(len(mi_values) * 0.1))
     return np.mean(sorted(mi_values, reverse=True)[:top_10_percent]).item()
 
 
 def get_random_MI_features_inputs_mean(features: torch.Tensor, inputs: torch.Tensor, n_neighbors: int):
-    return np.mean(mutual_info_regression(features, torch.randn(features.shape[0]), n_neighbors=n_neighbors))
+    shuffled_inputs = inputs[:, inputs.shape[1] // 2]
+    shuffled_inputs = shuffled_inputs[torch.randperm(shuffled_inputs.shape[0])]
+    shuffled_inputs = shuffled_inputs[torch.randperm(shuffled_inputs.shape[0])]
+    baseline_values = mutual_info_regression(features, shuffled_inputs, n_neighbors=n_neighbors)
+    top_10_percent = max(2, round(len(baseline_values) * 0.1))
+    return np.mean(sorted(baseline_values, reverse=True)[:top_10_percent]).item()
     
 
 def calc_MI_features_inputs(verbose: bool, features: torch.Tensor, inputs: torch.Tensor, n_neighbors: int):
@@ -50,13 +55,18 @@ def calc_MI_features_labels(features: torch.Tensor, labels: torch.Tensor, n_neig
 
 
 def get_random_MI_features_labels_mean(features: torch.Tensor, labels: torch.Tensor, n_neighbors: int):
-    return np.mean(mutual_info_classif(features, torch.randint(0, labels.max().item()+1, labels.shape).type_as(labels), n_neighbors=n_neighbors))
+    shuffled_labels = labels
+    shuffled_labels = shuffled_labels[torch.randperm(labels.shape[0])]
+    shuffled_labels = shuffled_labels[torch.randperm(labels.shape[0])]
+    baseline_values = mutual_info_classif(features, shuffled_labels, n_neighbors=n_neighbors)
+    top_10_percent = max(2, round(len(baseline_values) * 0.1))
+    return np.mean(sorted(baseline_values, reverse=True)[:top_10_percent]).item()
 
 
 def speed_test():
     import time
     stt = time.time()
-    print(calc_MI_features_inputs(True, torch.rand((3840, 2048)), torch.rand((3840, 4107)), 15))
+    print(calc_MI_features_inputs(True, torch.rand((1000, 2048)), torch.rand((1000, 4107)), 15))
     print(f'time cost: {time.time()-stt:.2f}s')
 
 
