@@ -60,6 +60,7 @@ def report(cfg, hy_mean, hy_max, hy_top, hx_mean, hx_max, hx_top):
             'hx_max': [np.mean(all_hx_maxes[ckpt]).item() for ckpt in ckpts],
             'hx_top': [np.mean(all_hx_topks[ckpt]).item() for ckpt in ckpts],
         })
-        f_name = f'results_{cfg.dataset}_neib{cfg.n_neighbors}_{datetime.datetime.now().strftime("%m-%d_%H-%M-%S")}.json'
+        dirname = os.path.dirname(os.getcwd())
+        f_name = f'results_{dirname}_neib{cfg.n_neighbors}_{"trainset" if cfg.train_set else "testset"}_{datetime.datetime.now().strftime("%m-%d_%H-%M-%S")}.json'
         df.to_json(f_name)
         print(f'==> results saved at {os.path.abspath(f_name)}')
