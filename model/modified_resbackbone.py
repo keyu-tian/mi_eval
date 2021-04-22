@@ -11,15 +11,7 @@ BN = nn.BatchNorm2d
 
 
 def load_clip_state_vision_model(model, ckpt_state: dict, warning):
-    if 'state_dict' in ckpt_state:
-        # our gvm-clip checkpoint
-        ckpt_state = ckpt_state['state_dict']
-    for p in ['module.vision_model.', 'module.backbone.', 'visual.', 'backbone.']:
-        if f'{p}conv1.weight' in ckpt_state.keys():
-            prefix = p
-            break
-    else:
-        prefix = ''
+    prefix = ''
 
     warning.append('======= loading CLIP model state... =======')
     if ckpt_state:
