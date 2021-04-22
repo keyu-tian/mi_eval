@@ -20,8 +20,8 @@ if __name__ == '__main__':
         with open(path, 'w', encoding='utf-8') as fp:
             fp.write(
                 ctt.replace(
-"""/mnt/lustre/tiankeyu/htl_ckpt""",
-"""/mnt/lustre/share/tiankeyu/htl_ckpt""",
+"""should be less than num_gpus""",
+"""should be no more than num_gpus""",
                 )
             )
     

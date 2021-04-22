@@ -9,6 +9,6 @@ checkpoints: [
    /mnt/lustre/tiankeyu/htl_ckpt/YG_clip_res50_yfcc15m_convertBB.pth,
    /mnt/lustre/tiankeyu/htl_ckpt/clip_res50_50M_noLiveness_convertBB.pth.tar,
    /mnt/lustre/tiankeyu/htl_ckpt/xueshuClip.pth.tar,
-]   # should be less than num_gpus
+]   # should be no more than num_gpus
 n_neighbors: 12
 calc_hx: False
