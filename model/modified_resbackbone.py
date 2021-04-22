@@ -145,7 +145,7 @@ class ModifiedResNet(nn.Module):
     """
 
     def __init__(self, layers, output_dim, heads, input_resolution=224, width=64,
-                 num_classes=1000, clip_pretrain_path=None, enable_attnpool=False):
+                 num_classes=1000, clip_pretrain_state=None, enable_attnpool=False):
 
         global BN
 
@@ -192,8 +192,8 @@ class ModifiedResNet(nn.Module):
                     nn.init.zeros_(param)
 
         self.warning = []
-        if clip_pretrain_path is not None:
-            load_clip_state_vision_model(self, clip_pretrain_path, self.warning)
+        if clip_pretrain_state is not None:
+            load_clip_state_vision_model(self, clip_pretrain_state, self.warning)
         self.warning = '\n'.join(self.warning)
 
     def _make_layer(self, planes, blocks, stride=1):
