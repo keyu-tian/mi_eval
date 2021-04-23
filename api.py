@@ -12,13 +12,25 @@ def calc_MI_hy(features: Tensor, labels: Tensor, n_neighbors: int = 12) -> Tuple
     """
     calculate MI(feature, label), i.e., MI(h, y).
     
-    :param features: 2D Tensor with the shape of (num_images, feature_dim)
-    :param labels: 1D Tensor with the shape of (num_images,)
-    :param n_neighbors: a integer value (a hyperparameter);
-                        a higher value may reduce variance of the estimation, but could introduce a bias;
-                        n_neighbors=12 is good enough by default.
+    Parameters
+    ----------
+    features :
+        2D feature FloatTensor.
+        With the shape of (num_images, feature_dim).
+    
+    labels :
+        1D label LongTensor.
+        With the shape of (num_images,)
+    
+    n_neighbors :
+        A integer value (a hyperparameter).
+        A higher value may reduce variance of the estimation, but could introduce a bias;
+        n_neighbors=12 is good enough by default.
 
-    :return: (hy_mean, hy_max, hy_top): three float values
+    Returns
+    --------
+    res_tuple :
+        Estimation results (hy_mean, hy_max, hy_top).
     
     recommended length of `features': n_images ~= 5000 (for saving time)
     Example:
@@ -47,11 +59,12 @@ def calc_MI_hy(features: Tensor, labels: Tensor, n_neighbors: int = 12) -> Tuple
     normalized_hy = [hy / hy_random for hy in hy_values]
     
     topk = max(2, round(len(hy_values) * 0.1))
-    return (
+    res_tuple = (
         np.mean(normalized_hy).item(),
         np.max(normalized_hy).item(),
         np.mean(sorted(normalized_hy, reverse=True)[:topk]).item()
     )
+    return res_tuple
 
 
 def __calc_MI_features_labels(features: torch.Tensor, labels: torch.Tensor, n_neighbors: int):
