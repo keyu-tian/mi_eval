@@ -137,12 +137,16 @@ class ImageNetDataset:
             print("[ERROR] Image loading failed! Location: {}".format(filename))
             return self[idx - 1]
     
-    def _build_transform(self):
+    def _build_transform(self, thin_img=False):
         # if self.eval:
         if True:
-            transform = torchvision.transforms.Compose([
+            sizing = [
+                torchvision.transforms.Resize((256, 128)),
+            ] if thin_img else [
                 torchvision.transforms.Resize(256),
                 torchvision.transforms.CenterCrop(224),
+            ]
+            transform = torchvision.transforms.Compose(sizing + [
                 torchvision.transforms.ToTensor(),
                 torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
             ])
@@ -164,7 +168,7 @@ class AttributeGenderDataset(ImageNetDataset):
         self.root_dir = root_dir
         self.meta_file = meta_file
         self.eval = eval
-        self.transform = self._build_transform()
+        self.transform = self._build_transform(thin_img=True)
         self.image_reader = pil_loader
         self.initialized = False
         self.bucket_name = bucket_name
