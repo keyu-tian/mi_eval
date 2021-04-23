@@ -68,9 +68,9 @@ def main():
     r50_bb.eval()
 
     # ========> 3. load data <========
-    features, inputs, labels = get_data(cfg, r50_bb, verbose=rank == 0)
+    img_hw, features, inputs, labels = get_data(cfg, r50_bb, verbose=rank == 0)
     if rank == 0:
-        print(f'\n{time_str()}[rk{rank}]: features={features.dtype} {tuple(features.shape)},  labels.shape={labels.dtype} {tuple(labels.shape)},  inputs.shape={inputs.dtype} {tuple(inputs.shape)}')
+        print(f'\n{time_str()}[rk{rank}]: img={img_hw[0]}x{img_hw[1]}, features={features.dtype} {tuple(features.shape)},  labels.shape={labels.dtype} {tuple(labels.shape)},  inputs.shape={inputs.dtype} {tuple(inputs.shape)}')
     
     # ========> 4. calc MI(h, y) <========
     stt = time.time()
@@ -153,6 +153,7 @@ def get_data(cfg, r50_bb, verbose=False):
     with torch.no_grad():
         bar = tqdm(test_ld) if verbose else test_ld
         for x, y in bar:
+            img_hw = tuple(y.shape[-2:])
             bs = x.shape[0]
             tot_bs += bs
             if tot_bs > 8000:  # calc MI on a subset for saving time
@@ -173,7 +174,7 @@ def get_data(cfg, r50_bb, verbose=False):
     labels = torch.cat(labels, dim=0).reshape(-1)
     inputs = torch.cat(inputs, dim=0)
     assert features.shape[0] == labels.shape[0] == inputs.shape[0]
-    return features, inputs, labels
+    return img_hw, features, inputs, labels
 
 
 if __name__ == '__main__':
