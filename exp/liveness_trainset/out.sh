@@ -4,6 +4,7 @@ cfg_file="${1:-"../cfg.yaml"}"
 l1=$(grep -n "\[" "${cfg_file}" | cut -d ":" -f 1)
 l2=$(grep -n "\]" "${cfg_file}" | cut -d ":" -f 1)
 n_gpus=$(((l2-l1-1)*2))
+echo "n_gpus=$n_gpus"
 
 PYTHONPATH=${PYTHONPATH}:${REL_PATH} GLOG_vmodule=MemcachedClient=-1 \
 spring.submit run --gpu -n${n_gpus} \

@@ -20,8 +20,13 @@ if __name__ == '__main__':
         with open(path, 'w', encoding='utf-8') as fp:
             fp.write(
                 ctt.replace(
-"""--train=False""",
-""""""
+"""
+n_gpus=$(((l2-l1-1)*2))
+""",
+"""
+n_gpus=$(((l2-l1-1)*2))
+echo "n_gpus=$n_gpus"
+"""
 ))
     
     dfs(os.getcwd(), upd)
