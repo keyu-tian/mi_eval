@@ -43,7 +43,7 @@ class Args(Tap):
     dataset: str
     train: bool = False
     batch_size: int = 256
-    n_neighbors: int = 10
+    n_neighbors: int = 12
     calc_hx: bool = False
     subimagenet_num_classes: int = 170
 
