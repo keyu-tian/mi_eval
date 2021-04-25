@@ -1,6 +1,6 @@
 checkpoints: [
-   /mnt/lustre/tengjianing/modelzoo/MM/dy/DF_MTL_LV1_10_R50_re_convertBB.pth.tar,
-   /mnt/lustre/tengjianing/modelzoo/MM/gs/GS_MTL_LV1_10_and_LV2eve_R50_convertBB.pth.tar,
-   /mnt/lustre/tengjianing/modelzoo/MM/gs/GS_MTL_LV1_10_and_LV2eve_Xformer_R50_convertBB.pth.tar,
-   /mnt/lustre/tengjianing/modelzoo/MM/gs/GS_MTL_LV1_10_and_LV2eve_4K_R50_convertBB.pth.tar,
+   /mnt/lustre/tiankeyu/htl_ckpt/DF_MTL_LV1_10_R50_re_convertBB.pth.tar,
+   /mnt/lustre/tiankeyu/htl_ckpt/GS_MTL_LV1_10_and_LV2eve_R50_convertBB.pth.tar,
+   /mnt/lustre/tiankeyu/htl_ckpt/GS_MTL_LV1_10_and_LV2eve_Xformer_R50_convertBB.pth.tar,
+   /mnt/lustre/tiankeyu/htl_ckpt/GS_MTL_LV1_10_and_LV2eve_4K_R50_convertBB.pth.tar,
 ]
