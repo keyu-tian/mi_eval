@@ -1,7 +1,5 @@
-from tap import Tap
 import datetime
 import os
-import sys
 import time
 from collections import OrderedDict
 from pprint import pformat
@@ -12,6 +10,7 @@ import torch
 import torch.nn.functional as F
 import yaml
 from easydict import EasyDict
+from tap import Tap
 from torch.utils.data import DataLoader
 from torchvision.transforms import transforms
 from tqdm import tqdm

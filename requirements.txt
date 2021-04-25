@@ -6,3 +6,4 @@ scikit-learn
 pyyaml
 easydict
 pytz
+typed-argument-parser
