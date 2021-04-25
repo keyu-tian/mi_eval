@@ -1,0 +1,3 @@
+checkpoints: [
+   /mnt/lustre/tiankeyu/htl_ckpt/DF_MTL_LV1_28_R50_convertBB.pth.tar,
+]

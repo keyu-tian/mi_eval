@@ -34,7 +34,7 @@ def calc_MI_hy(features: Tensor, labels: Tensor, n_neighbors: int = 12) -> Tuple
     
     recommended length of `features': n_images ~= 5000 (for saving time)
     Example:
-    >>> backbone = ...          # e.g., a Resnet50 backbone that returns 2D features with the shape of (batch_size, feature_dim)
+    >>> backbone = ...          # e.g., a Resnet50 backbone that returns features (2D Tensor) with the shape of (batch_size, feature_dim)
     >>> dataset_loader = ...    # e.g., a DataLoader of ImageNet
     >>>                         # **PLEASE NOTE**: JUST USE THE SIMPLEST transform (e.g., Resize + CenterCrop + ToTensor + Normalize)
     >>>
