@@ -23,6 +23,7 @@ def load_r50backbone(ckpt: str, norm_func=nn.BatchNorm2d, conv_func=nn.Conv2d):
     conv1_w_shape = state['conv1.weight'].shape
     modified_res50_with_deep_stem = conv1_w_shape[0] == 32
     enable_attnpool = 'attnpool.k_proj.weight' in state
+    enable_attnpool = False # todo: 暂时认为下游都不开 attnpool
     
     if modified_res50_with_deep_stem:
         r50_bb, warning = modified_res50backbone(clip_pretrain_state=state, enable_attnpool=enable_attnpool)

@@ -226,14 +226,14 @@ class ModifiedResNet(nn.Module):
         return feature
 
 
-def modified_res50backbone(**kwargs):
-    default_kwargs = {
-        'layers': [3, 4, 6, 3],
-        'output_dim': 1024,   # keep same with text transformer
-        'heads': 16,
-        'input_resolution': 224,
-        'width': 64,
-    }
-    default_kwargs.update(**kwargs)
-    r = ModifiedResNet(**default_kwargs)
+def modified_res50backbone(clip_pretrain_state, enable_attnpool):
+    r = ModifiedResNet(
+        layers=[3, 4, 6, 3],
+        output_dim=1024,   # keep same with text transformer
+        heads=16,
+        input_resolution=224,
+        width=64,
+        clip_pretrain_state=clip_pretrain_state,
+        enable_attnpool=enable_attnpool
+    )
     return r, r.warning
