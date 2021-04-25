@@ -20,14 +20,8 @@ if __name__ == '__main__':
         with open(path, 'w', encoding='utf-8') as fp:
             fp.write(
                 ctt.replace(
-"""
-l1=$(grep -n "\[" cfg.yaml | cut -d ":" -f 1)
-l2=$(grep -n "\]" cfg.yaml | cut -d ":" -f 1)
-""",
-"""
-l1=$(grep -n "\[" "${cfg_file}" | cut -d ":" -f 1)
-l2=$(grep -n "\]" "${cfg_file}" | cut -d ":" -f 1)
-"""
+"""--train=False""",
+""""""
 ))
     
     dfs(os.getcwd(), upd)
