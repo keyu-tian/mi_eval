@@ -157,7 +157,7 @@ def get_data(args: Args, r50_bb, verbose=False):
     with torch.no_grad():
         bar = tqdm(test_ld) if verbose else test_ld
         for x, y in bar:
-            img_hw = tuple(y.shape[-2:])
+            img_hw = tuple(x.shape[-2:])
             bs = x.shape[0]
             tot_bs += bs
             if tot_bs > 8000:  # calc MI on a subset for saving time
