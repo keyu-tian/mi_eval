@@ -1,5 +1,7 @@
+from tap import Tap
 import datetime
 import os
+import sys
 import time
 from collections import OrderedDict
 from pprint import pformat
@@ -37,23 +39,26 @@ def link_init():
     return link.get_rank(), link.get_world_size()
 
 
+class Args(Tap):
+    cfg_path: str
+    dataset: str
+    train: bool = False
+    batch_size: int = 256
+    n_neighbors: int = 10
+    calc_hx: bool = False
+    subimagenet_num_classes: int = 170
+
+
 def main():
-    # ========> 1. load config <========
-    with open('cfg.yaml', 'r') as fin:
-        cfg = EasyDict(yaml.safe_load(fin))
-    cfg.dataset = str(cfg.dataset).strip().lower()
-    cfg.n_neighbors = cfg.get('n_neighbors', 10)
-    cfg.train_set = cfg.get('train_set', False)
+    args = Args().parse_args()
+    
+    # ========> 1. load ckpt paths <========
+    with open(args.cfg_path.strip('\"\''), 'r') as fin:
+        ckpts = yaml.safe_load(fin)['checkpoints']
 
     rank, world_size = link_init()
-    ckpts = cfg.checkpoints
-    if len(ckpts) > world_size:
-        if rank == 0:
-            raise AttributeError(f'==> too many checkpoints!  num_ckpts={len(ckpts)} while world_size={world_size}')
-        else:
-            exit(-1)
     if rank == 0:
-        print(f'{time_str()}[rk{rank}]: cfg=\n{pformat(dict(cfg))}\n')
+        print(f'{time_str()}[rk{rank}]: args=\n{pformat(vars(args))}\n')
 
     # ========> 2. load checkpoints <========
     ckpt_idx = rank % len(ckpts)
@@ -68,17 +73,17 @@ def main():
     r50_bb.eval()
 
     # ========> 3. load data <========
-    img_hw, features, inputs, labels = get_data(cfg, r50_bb, verbose=rank == 0)
+    img_hw, features, inputs, labels = get_data(args, r50_bb, verbose=rank == 0)
     if rank == 0:
         print(f'\n{time_str()}[rk{rank}]: img={img_hw[0]}x{img_hw[1]}, features={features.dtype} {tuple(features.shape)},  labels.shape={labels.dtype} {tuple(labels.shape)},  inputs.shape={inputs.dtype} {tuple(inputs.shape)}')
     
     # ========> 4. calc MI(h, y) <========
     stt = time.time()
-    hy_values = calc_MI_features_labels(features, labels, cfg.n_neighbors)
+    hy_values = calc_MI_features_labels(features, labels, args.n_neighbors)
     hy_cost = time.time() - stt
     if rank == 0:
         print(f'{time_str()}[rk{rank}]: I(h, y) time cost = {hy_cost:.2f}s ({hy_cost / 60:.2f}min)')
-    hy_random = get_random_MI_features_labels_mean(features, labels, cfg.n_neighbors)
+    hy_random = get_random_MI_features_labels_mean(features, labels, args.n_neighbors)
     if rank == 0:
         print(
             f'{time_str()}[rk{rank}]: == RANDOM ==\n'
@@ -97,13 +102,13 @@ def main():
             )
 
     # ========> 5. calc MI(h, x) <========
-    if cfg.calc_hx:
+    if args.calc_hx:
         stt = time.time()
-        hx_values = calc_MI_features_inputs(rank == 0, features, inputs, cfg.n_neighbors)
+        hx_values = calc_MI_features_inputs(rank == 0, features, inputs, args.n_neighbors)
         hx_cost = time.time() - stt
         if rank == 0:
             print(f'{time_str()}[rk{rank}]: I(h, x) time cost = {hx_cost:.2f}s ({hx_cost / 60:.2f}min)')
-        hx_random = get_random_MI_features_inputs_mean(features, labels, cfg.n_neighbors)
+        hx_random = get_random_MI_features_inputs_mean(features, labels, args.n_neighbors)
         if rank == 0:
             print(
                 f'{time_str()}[rk{rank}]: == RANDOM ==\n'
@@ -125,13 +130,13 @@ def main():
     
     # ========> 6. report the results <========
     time.sleep(1)
-    report(cfg, hy_mean, hy_max, hy_top, hx_mean, hx_max, hx_top)
+    report(args, ckpts, hy_mean, hy_max, hy_top, hx_mean, hx_max, hx_top)
     
     link.barrier()
     link.finalize()
 
 
-def get_data(cfg, r50_bb, verbose=False):
+def get_data(args: Args, r50_bb, verbose=False):
     test_transform = transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
@@ -140,15 +145,15 @@ def get_data(cfg, r50_bb, verbose=False):
     ])
     data_clz, data_kw = {
         'subimagenet': (SubImageNetDataset, dict(
-            num_classes=cfg.get('subimagenet_num_classes', 50),
-            train=cfg.train_set, transform=test_transform
+            num_classes=args.subimagenet_num_classes,
+            train=args.train, transform=test_transform
         )),
-        'liveness': (Liveness, dict(train=cfg.train_set)),
-        'gender': (Gender, dict(train=cfg.train_set)),
-        'age': (Age, dict(train=cfg.train_set)),
-    }[cfg.dataset]
+        'liveness': (Liveness, dict(train=args.train)),
+        'gender': (Gender, dict(train=args.train)),
+        'age': (Age, dict(train=args.train)),
+    }[args.dataset]
     test_data = data_clz(**data_kw)
-    test_ld = DataLoader(test_data, batch_size=cfg.batch_size, shuffle=True, drop_last=False, num_workers=2, pin_memory=True)
+    test_ld = DataLoader(test_data, batch_size=args.batch_size, shuffle=True, drop_last=False, num_workers=2, pin_memory=True)
     tot_bs, inputs, features, labels = 0, [], [], []
     with torch.no_grad():
         bar = tqdm(test_ld) if verbose else test_ld

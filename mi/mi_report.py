@@ -12,8 +12,7 @@ except:
     import spring.linklink as link
 
 
-def report(cfg, hy_mean, hy_max, hy_top, hx_mean, hx_max, hx_top):
-    ckpts = cfg.checkpoints
+def report(args, ckpts, hy_mean, hy_max, hy_top, hx_mean, hx_max, hx_top):
     
     rank, world_size = link.get_rank(), link.get_world_size()
     hy_means, hy_maxes, hy_topks = torch.zeros(world_size), torch.zeros(world_size), torch.zeros(world_size)
@@ -61,6 +60,6 @@ def report(cfg, hy_mean, hy_max, hy_top, hx_mean, hx_max, hx_top):
             'hx_top': [np.mean(all_hx_topks[ckpt]).item() for ckpt in ckpts],
         })
         dirname = os.path.split(os.getcwd())[-1]
-        f_name = f'results_{dirname}_neib{cfg.n_neighbors}_{"trainset" if cfg.train_set else "testset"}_{datetime.datetime.now().strftime("%m-%d_%H-%M-%S")}.json'
+        f_name = f'results_{dirname}_neib{args.n_neighbors}_{"trainset" if args.train else "valset"}_{datetime.datetime.now().strftime("%m-%d_%H-%M-%S")}.json'
         df.to_json(f_name)
         print(f'==> results saved at {os.path.abspath(f_name)}')

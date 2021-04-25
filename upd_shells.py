@@ -9,7 +9,7 @@ def dfs(cwd, upd_fn):
             dfs(path, upd_fn)
         else:
             # if name == 'cfg.yaml' or name.endswith('.sh'):
-            if name.endswith('.yaml'):
+            if name.endswith('.sh'):
                 upd_fn(path)
 
 
@@ -20,13 +20,15 @@ if __name__ == '__main__':
         with open(path, 'w', encoding='utf-8') as fp:
             fp.write(
                 ctt.replace(
-"""n_neighbors: 12
-calc_hx: False""",
-"""n_neighbors: 12
-train_set: False
-calc_hx: False""",
-                )
-            )
+"""
+l1=$(grep -n "\[" cfg.yaml | cut -d ":" -f 1)
+l2=$(grep -n "\]" cfg.yaml | cut -d ":" -f 1)
+""",
+"""
+l1=$(grep -n "\[" "${cfg_file}" | cut -d ":" -f 1)
+l2=$(grep -n "\]" "${cfg_file}" | cut -d ":" -f 1)
+"""
+))
     
     dfs(os.getcwd(), upd)
     

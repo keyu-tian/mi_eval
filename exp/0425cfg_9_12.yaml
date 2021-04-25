@@ -1,0 +1,6 @@
+checkpoints: [
+   /mnt/lustre/tengjianing/modelzoo/MM/qh/MTL_LV1_only400wLiveness_R50.pth.tar,
+   /mnt/lustre/tengjianing/modelzoo/MM/gs/GS_MTL_LV1_10_and_LV2eve_new4K_R50_convertBB.pth.tar,
+   /mnt/lustre/tengjianing/modelzoo/MM/fz/ResNet50_convertBB_nobox_200000.pth.tar,
+   /mnt/lustre/tengjianing/modelzoo/MM/fz/ResNet50_converBBtillayer3_gtbox_22000.pth.tar,
+]
