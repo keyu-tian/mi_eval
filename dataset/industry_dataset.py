@@ -168,7 +168,8 @@ class AttributeGenderDataset(ImageNetDataset):
         self.root_dir = root_dir
         self.meta_file = meta_file
         self.eval = eval
-        self.transform = self._build_transform(thin_img=True)
+        # self.transform = self._build_transform(thin_img=True) # todo: 观察到crop成这样有性能损失，所以关掉thin_img
+        self.transform = self._build_transform(thin_img=False)
         self.image_reader = pil_loader
         self.initialized = False
         self.bucket_name = bucket_name
