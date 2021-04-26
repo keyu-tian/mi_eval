@@ -30,8 +30,8 @@ def load_r50backbone(ckpt: str, norm_func=nn.BatchNorm2d, conv_func=nn.Conv2d):
     else:
         r50_bb = ResBackbone(Bottleneck, [3, 4, 6, 3], norm_func=norm_func, conv_func=conv_func)
         msg = r50_bb.load_state_dict(state, strict=False)
-        unexpected_missing = [k for k in msg.missing_keys if not k.startswith('fc.')]
-        assert len(unexpected_missing) == 0, f'unexpected msg.missing_keys:\n{pformat(unexpected_missing)}'
+        missing = [k for k in msg.missing_keys if not k.startswith('fc.')]
+        assert len(missing) == 0, f'msg.missing_keys:\n{pformat(missing)}'
         unexpected_extra = msg.unexpected_keys
         if len(msg.unexpected_keys):
             warning = f'[warning] msg.unexpected_keys:\n{pformat(unexpected_extra)}'
