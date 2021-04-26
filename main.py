@@ -57,7 +57,7 @@ def main():
 
     rank, world_size = link_init()
     if rank == 0:
-        print(f'{time_str()}[rk{rank}]: args=\n{pformat(vars(args.as_dict()))}\n')
+        print(f'{time_str()}[rk{rank}]: args=\n{pformat(args.as_dict())}\n')
 
     # ========> 2. load checkpoints <========
     ckpt_idx = rank % len(ckpts)
