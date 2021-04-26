@@ -87,7 +87,7 @@ class Bottleneck(nn.Module):
 
 class ResBackbone(nn.Module):
 
-    def __init__(self, block, layers, norm_func=nn.BatchNorm2d, conv_func=nn.Conv2d):
+    def __init__(self, block, layers, norm_func=nn.BatchNorm2d, conv_func=nn.Conv2d, fc_dim=None):
         super(ResBackbone, self).__init__()
 
         global BN
@@ -110,7 +110,10 @@ class ResBackbone(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        # self.fc = nn.Linear(512 * block.expansion, num_classes)
+        if fc_dim is not None:
+            self.fc = nn.Linear(512 * block.expansion, fc_dim)
+        else:
+            self.fc = None
 
         # initialization
         for m in self.modules():
@@ -153,6 +156,14 @@ class ResBackbone(nn.Module):
 
         x = self.avgpool(layer4)
         feature = torch.flatten(x, 1)    # pre_fc: (B, fea_dim)
-        return feature
-
+        
+        if self.fc is not None:
+            logits = self.fc(feature)
+        else:
+            logits = torch.empty(1)
+        
+        return {
+            'layer4': feature,
+            'logits': logits
+        }
 

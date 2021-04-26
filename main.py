@@ -153,31 +153,46 @@ def get_data(args: Args, r50_bb, verbose=False):
     }[args.dataset]
     test_data = data_clz(**data_kw)
     test_ld = DataLoader(test_data, batch_size=args.batch_size, shuffle=True, drop_last=False, num_workers=2, pin_memory=True)
-    tot_bs, inputs, features, labels = 0, [], [], []
+    tot_bs, tot_correct, inputs, features, labels = 0, 0, [], [], []
+
+    if r50_bb.fc is not None:
+        assert r50_bb.fc.bias.numel() == test_data.cls_task_dim
+        
     with torch.no_grad():
         bar = tqdm(test_ld) if verbose else test_ld
-        for x, y in bar:
-            img_hw = tuple(x.shape[-2:])
-            bs = x.shape[0]
+        for inp, tar in bar:
+            img_hw = tuple(inp.shape[-2:])
+            bs = inp.shape[0]
             tot_bs += bs
-            if tot_bs > 8000:  # calc MI on a subset for saving time
-                break
-            h = r50_bb(x.cuda()).cpu()
-            y = y.view(bs, 1).int()
-            inputs.append(F.avg_pool2d(x, kernel_size=8).view(bs, -1))
-            features.append(h)
-            labels.append(y)
+            desc = '[extracting features]'
+            postfix = OrderedDict({'tot_bs': tot_bs, 'cur_bs': bs})
+            oup = r50_bb(inp.cuda())
+            if tot_bs <= 8000:
+                inputs.append(F.avg_pool2d(inp, kernel_size=8).view(bs, -1))
+                features.append(oup['layer4'].cpu())
+                labels.append(tar.view(bs, 1).int())
+            elif r50_bb.fc is None:
+                break   # calc MI on a subset for saving time
+            
+            if r50_bb.fc is not None:
+                tot_correct += oup['logits'].argmax(dim=1).eq(tar.cuda()).sum().item()
+                postfix['acc'] = f'{100. * tot_correct/tot_bs:5.2f}'
+                desc = '[inference]'
+            
             if verbose:
-                bar.set_description_str('[extracting features]')
-                bar.set_postfix(OrderedDict({'tot_bs': tot_bs, 'cur_bs': bs}))
+                bar.set_description_str(desc)
+                bar.set_postfix(postfix)
     if verbose:
         bar.clear()
         bar.close()
+        if r50_bb.fc is not None:
+            print(f' ==> final acc: {100. * tot_correct/tot_bs:5.2f}')
 
     features = torch.cat(features, dim=0)
     labels = torch.cat(labels, dim=0).reshape(-1)
     inputs = torch.cat(inputs, dim=0)
     assert features.shape[0] == labels.shape[0] == inputs.shape[0]
+
     return img_hw, features, inputs, labels
 
 

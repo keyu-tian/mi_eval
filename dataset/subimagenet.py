@@ -32,6 +32,8 @@ class ImageNetDataset(Dataset):
         tr_va_root, tr_va_meta = root / 'train', root / 'meta' / 'train.txt'
         te_root, te_meta = root / 'val', root / 'meta' / 'val.txt'
         
+        self.cls_task_dim = 1000
+        
         tu = (tr_va_root, tr_va_meta) if train else (te_root, te_meta)
         root_dir, meta_file = str(tu[0]), str(tu[1])
         self.root_dir = root_dir
@@ -146,6 +148,7 @@ class SubImageNetDataset(ImageNetDataset):
         super(SubImageNetDataset, self).__init__(train, transform, download, read_from)
         global _idx_1300images
         idx = _idx_1300images[:num_classes]
+        self.cls_task_dim = num_classes
         
         me = list(filter(lambda tu: tu[1] in idx, self.metas))
         self.metas = []

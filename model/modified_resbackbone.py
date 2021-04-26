@@ -145,7 +145,7 @@ class ModifiedResNet(nn.Module):
     """
 
     def __init__(self, layers, output_dim, heads, input_resolution=224, width=64,
-                 num_classes=1000, clip_pretrain_state=None, enable_attnpool=False):
+                 num_classes=1000, clip_pretrain_state=None, enable_attnpool=False, fc_dim=None):
 
         global BN
 
@@ -180,11 +180,17 @@ class ModifiedResNet(nn.Module):
             nn.init.normal_(self.attnpool.k_proj.weight, std=std)
             nn.init.normal_(self.attnpool.v_proj.weight, std=std)
             nn.init.normal_(self.attnpool.c_proj.weight, std=std)
-
+            fc_in_dim = output_dim
             # self.fc = nn.Linear(output_dim, num_classes)
         else:
+            fc_in_dim = embed_dim
             self.global_avgpool = nn.AdaptiveAvgPool2d((1, 1))
             # self.fc = nn.Linear(embed_dim, num_classes)
+
+        if fc_dim is not None:
+            self.fc = nn.Linear(fc_in_dim, fc_dim)
+        else:
+            self.fc = None
 
         for resnet_block in [self.layer1, self.layer2, self.layer3, self.layer4]:
             for name, param in resnet_block.named_parameters():
@@ -223,10 +229,19 @@ class ModifiedResNet(nn.Module):
             feature = self.attnpool(x)
         else:
             feature = self.global_avgpool(x).squeeze(2).squeeze(2)
-        return feature
+
+        if self.fc is not None:
+            logits = self.fc(feature)
+        else:
+            logits = torch.empty(1)
+        
+        return {
+            'layer4': feature,
+            'logits': logits
+        }
 
 
-def modified_res50backbone(clip_pretrain_state, enable_attnpool):
+def modified_res50backbone(clip_pretrain_state, enable_attnpool, fc_dim=None):
     r = ModifiedResNet(
         layers=[3, 4, 6, 3],
         output_dim=1024,   # keep same with text transformer
@@ -234,6 +249,7 @@ def modified_res50backbone(clip_pretrain_state, enable_attnpool):
         input_resolution=224,
         width=64,
         clip_pretrain_state=clip_pretrain_state,
-        enable_attnpool=enable_attnpool
+        enable_attnpool=enable_attnpool,
+        fc_dim=fc_dim
     )
     return r, r.warning

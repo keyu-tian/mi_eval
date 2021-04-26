@@ -28,7 +28,12 @@ def load_r50backbone(ckpt: str, norm_func=nn.BatchNorm2d, conv_func=nn.Conv2d):
     if modified_res50_with_deep_stem:
         r50_bb, warning = modified_res50backbone(clip_pretrain_state=state, enable_attnpool=enable_attnpool)
     else:
-        r50_bb = ResBackbone(Bottleneck, [3, 4, 6, 3], norm_func=norm_func, conv_func=conv_func)
+        with_head = 'fc.bias' in state
+        if with_head:
+            fc_dim = state['fc.bias'].numel()
+        else:
+            fc_dim = None
+        r50_bb = ResBackbone(Bottleneck, [3, 4, 6, 3], norm_func=norm_func, conv_func=conv_func, fc_dim=fc_dim)
         msg = r50_bb.load_state_dict(state, strict=False)
         missing = [k for k in msg.missing_keys if not k.startswith('fc.')]
         assert len(missing) == 0, f'msg.missing_keys:\n{pformat(missing)}'
