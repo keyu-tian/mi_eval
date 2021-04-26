@@ -1,4 +1,4 @@
 checkpoints: [
-   DF_MTL_LV1_28_R50_with_liveness_fc.pth.tar,
+   /mnt/lustre/tiankeyu/htl_ckpt/DF_MTL_LV1_28_R50_with_liveness_fc.pth.tar,
    # quadruple gpu
 ]
