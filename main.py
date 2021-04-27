@@ -165,7 +165,7 @@ def get_data(exp_postfix: str, args: Args, r50_bb, verbose=False):
         bar = tqdm(test_ld) if verbose else test_ld
         h_dict = {}
         for d in bar:
-            inp, tar, im_idx, fname = d['image'], d['gt'], d['image_id'], d['filename']
+            inp, tar, im_idx, fnames = d['image'], d['gt'], d['image_id'], d['filename']
             img_hw = tuple(inp.shape[-2:])
             bs = inp.shape[0]
             tot_bs += bs
@@ -175,7 +175,8 @@ def get_data(exp_postfix: str, args: Args, r50_bb, verbose=False):
             if tot_bs <= 8000:
                 inputs.append(F.avg_pool2d(inp, kernel_size=8).view(bs, -1))
                 h = oup['layer4'].cpu()
-                h_dict[fname] = h
+                for single_f, single_h in zip(fnames, h):
+                    h_dict[single_f] = single_h
                 features.append(h)
                 labels.append(tar.view(bs, 1).int())
             elif r50_bb.fc is None:
