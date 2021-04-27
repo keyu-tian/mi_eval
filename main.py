@@ -175,8 +175,8 @@ def get_data(exp_postfix: str, args: Args, r50_bb, verbose=False):
             if tot_bs <= 8000:
                 inputs.append(F.avg_pool2d(inp, kernel_size=8).view(bs, -1))
                 h = oup['layer4'].cpu()
-                for single_f, single_h in zip(fnames, h):
-                    h_dict[single_f] = single_h
+                for single_f, single_h, label in zip(fnames, h, tar.view(-1)):
+                    h_dict[single_f] = [single_h, label]
                 features.append(h)
                 labels.append(tar.view(bs, 1).int())
             elif r50_bb.fc is None:
