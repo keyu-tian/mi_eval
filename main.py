@@ -164,6 +164,7 @@ def get_data(exp_postfix: str, args: Args, r50_bb, verbose=False):
     with torch.no_grad():
         bar = tqdm(test_ld) if verbose else test_ld
         h_dict = {}
+        saved = False
         for d in bar:
             inp, tar, im_idx, fnames = d['image'], d['gt'], d['image_id'], d['filename']
             img_hw = tuple(inp.shape[-2:])
@@ -179,8 +180,14 @@ def get_data(exp_postfix: str, args: Args, r50_bb, verbose=False):
                     h_dict[single_f] = [single_h, label]
                 features.append(h)
                 labels.append(tar.view(bs, 1).int())
-            elif r50_bb.fc is None:
-                break   # calc MI on a subset for saving time
+            else:
+                if verbose and args.save_fname_to_h and not saved:
+                    saved = True
+                    ckpt_name = f'fname_to_h_{exp_postfix}.pth.tar'
+                    torch.save(h_dict, ckpt_name)
+                    print(f'rk[00] ==> fname_to_h saved @ {ckpt_name}')
+                if r50_bb.fc is None:
+                    break   # calc MI on a subset for saving time
             
             if r50_bb.fc is not None:
                 tot_correct += oup['logits'].argmax(dim=1).eq(tar.cuda()).sum().item()
@@ -196,11 +203,6 @@ def get_data(exp_postfix: str, args: Args, r50_bb, verbose=False):
         if r50_bb.fc is not None:
             print(f'rk[00] ==> final acc: {100. * tot_correct/tot_bs:5.2f}')
 
-        if args.save_fname_to_h:
-            ckpt_name = f'fname_to_h_{exp_postfix}.pth.tar'
-            torch.save(h_dict, ckpt_name)
-            print(f'rk[00] ==> fname_to_h saved @ {ckpt_name}')
-        
     features = torch.cat(features, dim=0)
     labels = torch.cat(labels, dim=0).reshape(-1)
     inputs = torch.cat(inputs, dim=0)
