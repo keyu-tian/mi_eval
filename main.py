@@ -46,10 +46,13 @@ class Args(Tap):
     n_neighbors: int = 12
     calc_hx: bool = False
     subimagenet_num_classes: int = 170
+    save_fname_to_h: bool = False
 
 
 def main():
     args = Args().parse_args()
+    dirname = os.path.split(os.getcwd())[-1]
+    exp_postfix = f'{dirname}_neib{args.n_neighbors}_{"trainset" if args.train else "valset"}_{datetime.datetime.now().strftime("%m-%d_%H-%M-%S")}'
     
     # ========> 1. load ckpt paths <========
     with open(args.cfg_path.strip('\"\''), 'r') as fin:
@@ -72,7 +75,7 @@ def main():
     r50_bb.eval()
 
     # ========> 3. load data <========
-    img_hw, features, inputs, labels = get_data(args, r50_bb, verbose=rank == 0)
+    img_hw, features, inputs, labels = get_data(exp_postfix, args, r50_bb, verbose=rank == 0)
     if rank == 0:
         print(f'\n{time_str()}[rk{rank}]: img={img_hw[0]}x{img_hw[1]}, features={features.dtype} {tuple(features.shape)},  labels.shape={labels.dtype} {tuple(labels.shape)},  inputs.shape={inputs.dtype} {tuple(inputs.shape)}')
     
@@ -129,13 +132,13 @@ def main():
     
     # ========> 6. report the results <========
     time.sleep(1)
-    report(args, ckpts, hy_mean, hy_max, hy_top, hx_mean, hx_max, hx_top)
+    report(exp_postfix, ckpts, hy_mean, hy_max, hy_top, hx_mean, hx_max, hx_top)
     
     link.barrier()
     link.finalize()
 
 
-def get_data(args: Args, r50_bb, verbose=False):
+def get_data(exp_postfix: str, args: Args, r50_bb, verbose=False):
     test_transform = transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
@@ -160,7 +163,9 @@ def get_data(args: Args, r50_bb, verbose=False):
         
     with torch.no_grad():
         bar = tqdm(test_ld) if verbose else test_ld
-        for inp, tar in bar:
+        h_dict = {}
+        for d in bar:
+            inp, tar, im_idx, fname = d['image'], d['gt'], d['image_id'], d['filename']
             img_hw = tuple(inp.shape[-2:])
             bs = inp.shape[0]
             tot_bs += bs
@@ -169,7 +174,9 @@ def get_data(args: Args, r50_bb, verbose=False):
             oup = r50_bb(inp.cuda())
             if tot_bs <= 8000:
                 inputs.append(F.avg_pool2d(inp, kernel_size=8).view(bs, -1))
-                features.append(oup['layer4'].cpu())
+                h = oup['layer4'].cpu()
+                h_dict[fname] = h
+                features.append(h)
                 labels.append(tar.view(bs, 1).int())
             elif r50_bb.fc is None:
                 break   # calc MI on a subset for saving time
@@ -186,8 +193,13 @@ def get_data(args: Args, r50_bb, verbose=False):
         bar.clear()
         bar.close()
         if r50_bb.fc is not None:
-            print(f' ==> final acc: {100. * tot_correct/tot_bs:5.2f}')
+            print(f'rk[00] ==> final acc: {100. * tot_correct/tot_bs:5.2f}')
 
+        if args.save_fname_to_h:
+            ckpt_name = f'fname_to_h_{exp_postfix}.pth.tar'
+            torch.save(h_dict, ckpt_name)
+            print(f'rk[00] ==> fname_to_h saved @ {ckpt_name}')
+        
     features = torch.cat(features, dim=0)
     labels = torch.cat(labels, dim=0).reshape(-1)
     inputs = torch.cat(inputs, dim=0)

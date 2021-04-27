@@ -122,12 +122,10 @@ class ImageNetDataset:
                 img = self.transform(img)
             img: torch.Tensor
             label: int
-            return img, label
+            # return img, label
             item = {
                 'image': img,
-                'gt': {'global': {
-                    self.cls_task_name: label
-                }},
+                'gt': label,
                 'image_id': idx,
                 'filename': filename
             }
@@ -200,12 +198,10 @@ class AttributeGenderDataset(ImageNetDataset):
                 img = self.transform(img)
             img: torch.Tensor
             label: int
-            return img, label
+            # return img, label
             item = {
                 'image': img,
-                'gt': {'global': {
-                    self.cls_task_name: label
-                }},
+                'gt': label,
                 'image_id': idx,
                 'filename': filename
             }

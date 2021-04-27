@@ -111,7 +111,14 @@ class ImageNetDataset(Dataset):
         img = pil_loader(self.read_file(img_path))
         if self.transform is not None:
             img = self.transform(img)
-        return img, label
+
+        item = {
+            'image': img,
+            'gt': label,
+            'image_id': idx,
+            'filename': img_path
+        }
+        return item
 
 
 _idx_1300images = [
