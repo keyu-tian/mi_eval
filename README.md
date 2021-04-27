@@ -9,11 +9,9 @@
 
 ### Run
 
-- 1. cd 到 `exp` 文件夹下的某个数据集名文件夹下。共四个数据集可测：活体 `liveness`，属性年龄 `age`，属性性别 `gender`，ImageNet 子集 `subimagenet`
-- 2. 在 `cfg.yaml` 里面的 `checkpoints` 修改想测的 ckpt 的路径
-- 3. 在 `cfg.yaml` 同级下 `sh ./out.sh` 或者 `sh ./spring.sh`（分别是 out 和 in 模式）
-- 4. 大概 10 min 内可以计算完成，最终输出表格的 hy 是 MI(h, y)
-- 5. 如果想计算 MI(h, x)，需要在 `cfg.yaml` 打开 `calc_hx`；因为目前 MI(h, x) 和下游 finetune 以后的相关性不强而且计算比较慢，所以都关掉 MI(h, x) 的计算了
+- 1. cd 到 `exp` 文件夹下的某个数据集名文件夹下，比如 `liveness_val`。共四个数据集可测：活体 `liveness`，属性年龄 `age`，属性性别 `gender`，ImageNet 子集 `subimagenet`
+- 2. 选好上级路径想用的 `cfg.yaml`，比如 `../cfg_0422_jianing_1_4.yaml`，然后 `sh ./out.sh ../cfg_0422_jianing_1_4.yaml` 即可
+- 3. 大概 10 min 内可以计算完成，最终输出表格中的 hy 的意思是 MI(h, y)
 
 ### 结果打印示例
 
