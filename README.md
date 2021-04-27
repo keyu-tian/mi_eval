@@ -9,8 +9,8 @@
 
 ### Run
 
-- 1. cd 到 `exp` 文件夹下的某个数据集名文件夹下，比如 `liveness_val`。共四个数据集可测：活体 `liveness`，属性年龄 `age`，属性性别 `gender`，ImageNet 子集 `subimagenet`
-- 2. 选好上级路径想用的 `cfg.yaml`，比如 `../cfg_0422_jianing_1_4.yaml`，然后 `sh ./out.sh ../cfg_0422_jianing_1_4.yaml` 即可
+- 1. cd 到 `exp` 文件夹下的某个数据集名文件夹下，比如 `liveness_valset`。共四个数据集可测：活体 `liveness`，属性年龄 `age`，属性性别 `gender`，ImageNet 子集 `subimagenet`
+- 2. 进入某个数据集文件夹后，选好上级路径想用的 `cfg.yaml`，比如 `../cfg_0426_siyu_with_liveness_head.yaml`，然后 `sh ./out.sh ../cfg_0426_siyu_with_liveness_head.yaml` 即可
 - 3. 大概 10 min 内可以计算完成，最终输出表格中的 hy 的意思是 MI(h, y)
 
 ### 结果打印示例
