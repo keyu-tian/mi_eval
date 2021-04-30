@@ -181,13 +181,14 @@ def get_data(exp_postfix: str, args: Args, r50_bb, verbose=False):
                 features.append(h)
                 labels.append(tar.view(bs, 1).int())
             else:
-                if verbose and args.save_fname_to_h and not saved:
-                    saved = True
-                    ckpt_name = f'fname_to_h_{exp_postfix}.pth.tar'
-                    torch.save(h_dict, ckpt_name)
-                    print(f'rk[00] ==> fname_to_h saved @ {ckpt_name}')
-                
                 break
+                
+                # if verbose and args.save_fname_to_h and not saved:
+                #     saved = True
+                #     ckpt_name = f'fname_to_h_{exp_postfix}.pth.tar'
+                #     torch.save(h_dict, ckpt_name)
+                #     print(f'rk[00] ==> fname_to_h saved @ {ckpt_name}')
+                
                 # if r50_bb.fc is None:
                 #     break   # calc MI on a subset for saving time
             
