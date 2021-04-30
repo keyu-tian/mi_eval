@@ -1,0 +1,4 @@
+checkpoints: [
+   /mnt/lustre/tengjianing/modelzoo/CLIP/YG_clip_res50_yfcc15m_convertBB.pth,
+   /mnt/lustre/tengjianing/modelzoo/MM/ky/KY_MTL_Lv1_10_imn_val_MIhy_convertBB.pth.tar
+]

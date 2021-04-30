@@ -1,0 +1,6 @@
+checkpoints: [
+   /mnt/lustre/tengjianing/modelzoo/R50_imageNet.pth,
+   /mnt/lustre/tengjianing/modelzoo/MM/dy/DY_MTL_LV1_30_R50_convertBB.pth.tar,
+   /mnt/lustre/tengjianing/modelzoo/MM/dy/DF_MTL_LV1_39_R50_convertBB.pth.tar,
+   /mnt/lustre/tengjianing/modelzoo/MM/dy/DF_MTL_LV1_10_R50_re_convertBB.pth.tar
+]
