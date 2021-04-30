@@ -85,13 +85,13 @@ def main():
     hy_cost = time.time() - stt
     if rank == 0:
         print(f'{time_str()}[rk{rank}]: I(h, y) time cost = {hy_cost:.2f}s ({hy_cost / 60:.2f}min)')
-    hy_random = get_random_MI_features_labels_mean(features, labels, args.n_neighbors)
-    if rank == 0:
-        print(
-            f'{time_str()}[rk{rank}]: == RANDOM ==\n'
-            f'I(h, y):    mean={hy_random:.3g}'
-        )
-    hy_values = [abs(v / hy_random) ** 0.5 for v in hy_values]      # normalize MI values
+    # hy_random = get_random_MI_features_labels_mean(features, labels, args.n_neighbors)
+    # if rank == 0:
+    #     print(
+    #         f'{time_str()}[rk{rank}]: == RANDOM ==\n'
+    #         f'I(h, y):    mean={hy_random:.3g}'
+    #     )
+    # hy_values = [abs(v / hy_random) ** 0.5 for v in hy_values]      # normalize MI values
     hy_mean, hy_max = np.mean(hy_values).item(), max(hy_values)
     hy_top = np.mean(sorted(hy_values, reverse=True)[:max(2, round(len(hy_values) * 0.1))]).item()
     for i in range(len(ckpts)):
@@ -110,13 +110,13 @@ def main():
         hx_cost = time.time() - stt
         if rank == 0:
             print(f'{time_str()}[rk{rank}]: I(h, x) time cost = {hx_cost:.2f}s ({hx_cost / 60:.2f}min)')
-        hx_random = get_random_MI_features_inputs_mean(features, labels, args.n_neighbors)
-        if rank == 0:
-            print(
-                f'{time_str()}[rk{rank}]: == RANDOM ==\n'
-                f'I(h, x):    mean={hx_random:.3g}'
-            )
-        hx_values = [abs(v / hx_random) ** 0.5 for v in hx_values]  # normalize MI values
+        # hx_random = get_random_MI_features_inputs_mean(features, labels, args.n_neighbors)
+        # if rank == 0:
+        #     print(
+        #         f'{time_str()}[rk{rank}]: == RANDOM ==\n'
+        #         f'I(h, x):    mean={hx_random:.3g}'
+        #     )
+        # hx_values = [abs(v / hx_random) ** 0.5 for v in hx_values]  # normalize MI values
         hx_mean, hx_max = np.mean(hx_values).item(), max(hx_values)
         hx_top = np.mean(sorted(hx_values, reverse=True)[:max(2, round(len(hx_values) * 0.15))]).item()
         for i in range(len(ckpts)):
