@@ -158,8 +158,8 @@ def get_data(exp_postfix: str, args: Args, r50_bb, verbose=False):
     test_ld = DataLoader(test_data, batch_size=args.batch_size, shuffle=True, drop_last=False, num_workers=2, pin_memory=True)
     tot_bs, tot_correct, inputs, features, labels = 0, 0, [], [], []
 
-    if r50_bb.fc is not None:
-        assert r50_bb.fc.bias.numel() == test_data.cls_task_dim
+    # if r50_bb.fc is not None:
+    #     assert r50_bb.fc.bias.numel() == test_data.cls_task_dim
         
     with torch.no_grad():
         bar = tqdm(test_ld) if verbose else test_ld
@@ -186,13 +186,15 @@ def get_data(exp_postfix: str, args: Args, r50_bb, verbose=False):
                     ckpt_name = f'fname_to_h_{exp_postfix}.pth.tar'
                     torch.save(h_dict, ckpt_name)
                     print(f'rk[00] ==> fname_to_h saved @ {ckpt_name}')
-                if r50_bb.fc is None:
-                    break   # calc MI on a subset for saving time
+                
+                break
+                # if r50_bb.fc is None:
+                #     break   # calc MI on a subset for saving time
             
-            if r50_bb.fc is not None:
-                tot_correct += oup['logits'].argmax(dim=1).eq(tar.cuda()).sum().item()
-                postfix['acc'] = f'{100. * tot_correct/tot_bs:5.2f}'
-                desc = '[inference]'
+            # if r50_bb.fc is not None:
+            #     tot_correct += oup['logits'].argmax(dim=1).eq(tar.cuda()).sum().item()
+            #     postfix['acc'] = f'{100. * tot_correct/tot_bs:5.2f}'
+            #     desc = '[inference]'
             
             if verbose:
                 bar.set_description_str(desc)
@@ -200,8 +202,8 @@ def get_data(exp_postfix: str, args: Args, r50_bb, verbose=False):
     if verbose:
         bar.clear()
         bar.close()
-        if r50_bb.fc is not None:
-            print(f'rk[00] ==> final acc: {100. * tot_correct/tot_bs:5.2f}')
+        # if r50_bb.fc is not None:
+        #     print(f'rk[00] ==> final acc: {100. * tot_correct/tot_bs:5.2f}')
 
     features = torch.cat(features, dim=0)
     labels = torch.cat(labels, dim=0).reshape(-1)
